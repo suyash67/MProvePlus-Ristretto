@@ -509,12 +509,21 @@ impl MProvePlus {
         transcript.extend_from_slice(self.T1.compress().as_bytes());
         transcript.extend_from_slice(self.T2.compress().as_bytes());
         let x = Scalar::hash_from_bytes::<Sha512>(&transcript);
-        
-        // we are using already computed constraint vectors by prover
-        let theta_inv = self.constraint_vec.theta_inv.clone();
-        let alpha = self.constraint_vec.alpha.clone();
-        let delta = self.constraint_vec.delta.clone();
-        let beta = self.constraint_vec.beta.clone();     
+
+        // comment out the following code if you wish to use pre-computed constraint vectors.
+        // build constraint vectors
+        let constraint_vec1 = Constraints::generate_constraints(u,v,y,z,n,s);
+        let theta_inv = constraint_vec1.theta_inv.clone();
+        let alpha = constraint_vec1.alpha.clone();
+        let delta = constraint_vec1.delta.clone();
+        let beta = constraint_vec1.beta.clone();
+
+        // uncomment the following code to use the already computed constraint vectors.
+        // // we are using already computed constraint vectors by prover
+        // let theta_inv = self.constraint_vec.theta_inv.clone();
+        // let alpha = self.constraint_vec.alpha.clone();
+        // let delta = self.constraint_vec.delta.clone();
+        // let beta = self.constraint_vec.beta.clone();     
 
         // verification equation #2
         // lhs
