@@ -211,13 +211,18 @@ impl MProvePlus {
         // size of honestly encoded witness vector
         let t = s*n + 2*n + s + 3;
 
+        // transcript used for generating challenges
+        let mut transcript: Vec<u8> = Vec::new();
+
         // other prelims
         let p_len = 2*n + s + 3;
         let mut rng = rand::thread_rng();
 
         // generate u,v
-        let u = Scalar::hash_from_bytes::<Sha512>(b"challenge_u");
-        let v = Scalar::hash_from_bytes::<Sha512>(b"challenge_v");
+        transcript.extend_from_slice(G.compress().as_bytes());
+        let u = Scalar::hash_from_bytes::<Sha512>(&transcript);
+        transcript.extend_from_slice(H.compress().as_bytes());
+        let v = Scalar::hash_from_bytes::<Sha512>(&transcript);
 
         // define e_prime, E_mat and e_hat
         let e_prime = E_vec;
@@ -325,7 +330,8 @@ impl MProvePlus {
         );
 
         // challenge w
-        let w = Scalar::hash_from_bytes::<Sha512>(b"challenge_w");
+        transcript.extend_from_slice(A.compress().as_bytes());
+        let w = Scalar::hash_from_bytes::<Sha512>(&transcript);
 
         // defining g_w
         let mut g_vec_w: Vec<RistrettoPoint> = vec![*G, C_res, *Gt];
@@ -351,8 +357,10 @@ impl MProvePlus {
         let S = (0..t).map(|i| h_vec[i] * s_R[i]).fold(sL_gw, |acc, x| acc + x);
 
         // challenges y,z
-        let y = Scalar::hash_from_bytes::<Sha512>(b"challenge_y");
-        let z = Scalar::hash_from_bytes::<Sha512>(b"challenge_z");
+        transcript.extend_from_slice(S.compress().as_bytes());
+        let y = Scalar::hash_from_bytes::<Sha512>(&transcript);
+        transcript.extend_from_slice(S.compress().as_bytes());
+        let z = Scalar::hash_from_bytes::<Sha512>(&transcript);
 
         // generate constraint vectors
         let constraint_vec = Constraints::generate_constraints(u,v,y,z,n,s);
@@ -378,7 +386,9 @@ impl MProvePlus {
         let T2 = G*t2 + H*tau2;
 
         // generate challenge x
-        let x = Scalar::hash_from_bytes::<Sha512>(b"challenge_x");
+        transcript.extend_from_slice(T1.compress().as_bytes());
+        transcript.extend_from_slice(T2.compress().as_bytes());
+        let x = Scalar::hash_from_bytes::<Sha512>(&transcript);
         
         // P -> V: tau_x, r, t_hat
         // compute tau_x, r, Lp, Rp, t_hat
@@ -475,9 +485,30 @@ impl MProvePlus {
         let N = t.next_power_of_two();
         let res = N-t;
 
+        // transcript initialization
+        let mut transcript: Vec<u8> = Vec::new();
+
         // re-generate challenges u, v, y, z
-        let u = Scalar::hash_from_bytes::<Sha512>(b"challenge_u");
-        let v = Scalar::hash_from_bytes::<Sha512>(b"challenge_v");
+        transcript.extend_from_slice(G.compress().as_bytes());
+        let u = Scalar::hash_from_bytes::<Sha512>(&transcript);
+        transcript.extend_from_slice(H.compress().as_bytes());
+        let v = Scalar::hash_from_bytes::<Sha512>(&transcript);
+
+        // re-generate challenge w and compute Q
+        transcript.extend_from_slice(self.A.compress().as_bytes());
+        let w = Scalar::hash_from_bytes::<Sha512>(&transcript);
+        let Q = RistrettoPoint::hash_from_bytes::<Sha512>(b"test point");
+
+        // re-generate challenge y, z
+        transcript.extend_from_slice(self.S.compress().as_bytes());
+        let y = Scalar::hash_from_bytes::<Sha512>(&transcript);
+        transcript.extend_from_slice(self.S.compress().as_bytes());
+        let z = Scalar::hash_from_bytes::<Sha512>(&transcript);
+
+        // re-generate challenge x
+        transcript.extend_from_slice(self.T1.compress().as_bytes());
+        transcript.extend_from_slice(self.T2.compress().as_bytes());
+        let x = Scalar::hash_from_bytes::<Sha512>(&transcript);
         
         // we are using already computed constraint vectors by prover
         let theta_inv = self.constraint_vec.theta_inv.clone();
@@ -492,19 +523,12 @@ impl MProvePlus {
         let left_side = Gt_hat + Htau_x;
 
         // rhs
-        // re-generate challenge x
-        let x = Scalar::hash_from_bytes::<Sha512>(b"challenge_x");
-
         let Gdelta = G * delta;
         let Tx = self.T1 * x;
         let Tx_sq = self.T2 * (x*x);
         let right_side = Gdelta + Tx + Tx_sq;
 
         // towards verification eqn #3
-        // re-generate challenge w and compute Q
-        let w = Scalar::hash_from_bytes::<Sha512>(b"challenge_w");
-        let Q = RistrettoPoint::hash_from_bytes::<Sha512>(b"test point");
-
         // define compressed stmt Y_hat_vec
         let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| P_vec[i] * u).collect();
         
