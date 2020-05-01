@@ -21,6 +21,11 @@ use alloc::vec;
 use merlin::Transcript;
 use core::iter;
 use sha2::Sha512;
+use core::cmp;
+use rand::distributions::{Distribution, Uniform};
+use rand::Rng;
+use curve25519_dalek::constants;
+use crate::generators::{PedersenGens};
 
 #[derive(Clone, Debug)]
 pub struct Constraints{
@@ -556,6 +561,112 @@ impl MProvePlus {
         } else {
             Err(MProvePlusError)
         }
+    }
+
+    pub fn gen_params(n: usize, s: usize) -> (
+        RistrettoPoint,
+        RistrettoPoint,
+        RistrettoPoint,
+        RistrettoPoint, 
+        Vec<RistrettoPoint>,
+        Vec<RistrettoPoint>,
+        Vec<RistrettoPoint>,
+        Vec<RistrettoPoint>,
+        Vec<RistrettoPoint>,
+        Vec<RistrettoPoint>,
+        Vec<RistrettoPoint>,
+        Vec<RistrettoPoint>,
+        Vec<Scalar>,
+        Vec<Scalar>,
+        Scalar,
+    ) {
+        
+        let sn = s * n;
+        let t = sn + 2*n + s + 3;
+        let one = Scalar::one();
+        let mut rng = rand::thread_rng();
+
+        // generate random amounts in range {0,..,2^{32}-1}
+        let a_vec: Vec<Scalar> = (0..s).map(|_| Scalar::from(rng.gen::<u32>())).collect();
+        
+        // generate blinding factors
+        let r_vec: Vec<Scalar> = (0..s).map(|_| Scalar::random(&mut rng)).collect();
+
+        // generate secret keys
+        let x_vec: Vec<Scalar> = (0..s).map(|_| Scalar::random(&mut rng)).collect();
+        
+        // G, H, Gt - curve points for generating outputs and key-images
+        let G = constants::RISTRETTO_BASEPOINT_POINT;
+        let H = RistrettoPoint::hash_from_bytes::<Sha512>(G.compress().as_bytes());
+        let Gt = RistrettoPoint::hash_from_bytes::<Sha512>(b"block_height_100");
+        let H_prime = RistrettoPoint::hash_from_bytes::<Sha512>(b"h_prime");
+
+        let pgens = PedersenGens{B: H, B_blinding: G};
+
+        // generate p_vec, g_prime_vec, h_vec
+        let p_len = 2*n+s+3;
+        let g_prime_len = t-p_len;
+        let h_len = t;
+        let N = (t as u64).next_power_of_two();
+        let res = (N as usize)-t;
+
+        let g_prime_vec: Vec<RistrettoPoint> = (0..g_prime_len).map(|_| RistrettoPoint::random(&mut rng)).collect();
+        let h_vec: Vec<RistrettoPoint> = (0..h_len).map(|_| RistrettoPoint::random(&mut rng)).collect();
+
+        let p_vec: Vec<RistrettoPoint> = (0..p_len).map(|_| RistrettoPoint::random(&mut rng)).collect();
+
+        let g_vec_append: Vec<RistrettoPoint> = (0..res).map(|_| RistrettoPoint::random(&mut rng)).collect();
+        let h_vec_append: Vec<RistrettoPoint> = (0..res).map(|_| RistrettoPoint::random(&mut rng)).collect();
+        
+        // generate random ring addresses and Hash of them 
+        let mut P_vec: Vec<RistrettoPoint> = (0..n).map(|_| RistrettoPoint::random(&mut rng)).collect();
+        let H_vec: Vec<RistrettoPoint> = (0..n).map(|_| RistrettoPoint::random(&mut rng)).collect();
+        
+        // Select random outputs owned by the exchange
+        let mut C_vec_mut: Vec<RistrettoPoint> = (0..n).map(|_| RistrettoPoint::random(&mut rng)).collect();        
+        
+        // generate random index vector of size s
+        let setsize = n / s;
+        let mut start_idx = 0;
+        let mut end_idx = cmp::max(1, setsize-1);
+        let idx = (0..s).map(|_| {
+            
+            let dist1 = Uniform::from(start_idx..end_idx);
+            start_idx = setsize + start_idx;
+            end_idx =  cmp::min(n-1, end_idx + setsize);
+
+            dist1.sample(&mut rng)
+        })
+        .collect::<Vec<usize>>();
+
+        // generate commitment to total reserves
+        let gamma = Scalar::random(&mut rng);
+        let Gt_gamma = Gt * gamma;
+        let mut C_res = Gt_gamma;
+
+        let mut index = 0;
+        let E_vec = (0..n)
+            .map(|i| {
+                if index < idx.len() {
+                    if i == idx[index] {
+                        // generate commitments using a_vec, r_vec
+                        C_vec_mut[i as usize] = pgens.commit(a_vec[index as usize], r_vec[index as usize]);
+                        P_vec[i as usize] = G * x_vec[index];
+                        C_res = C_res + C_vec_mut[i];
+                        index = index + 1;
+                        one.clone()
+                    }
+                    else {
+                        Scalar::zero()
+                    }
+                }
+                else{
+                    Scalar::zero()
+                }
+            })
+            .collect::<Vec<Scalar>>();
+
+        (G, H, Gt, H_prime, p_vec, g_prime_vec, h_vec, g_vec_append, h_vec_append, C_vec_mut, P_vec, H_vec, E_vec, x_vec, gamma)
     }
 }
 
