@@ -1,3 +1,12 @@
+/*
+
+Copyright (c) 2018 Chain, Inc.
+This file is a part of the bulletproofs package by dalek-cryptography.
+Link: https://github.com/dalek-cryptography/bulletproofs
+Description: Utilities for Scalar operations.
+
+*/
+
 #![allow(non_snake_case)]
 
 use curve25519_dalek::scalar::Scalar;

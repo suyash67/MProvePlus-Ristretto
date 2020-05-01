@@ -1,5 +1,11 @@
-//! The `generators` module contains API for producing a
-//! set of generators for a rangeproof.
+/*
+
+Copyright (c) 2018 Chain, Inc.
+This file is a part of the bulletproofs package by dalek-cryptography.
+Link: https://github.com/dalek-cryptography/bulletproofs
+Description: Constructing generators for aggregated bulletproofs.
+
+*/
 
 #![allow(non_snake_case)]
 

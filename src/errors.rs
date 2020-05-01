@@ -1,4 +1,11 @@
-//! Errors related to proving and verifying proofs.
+/*
+
+Copyright (c) 2018 Chain, Inc.
+This file is a part of the bulletproofs package by dalek-cryptography.
+Link: https://github.com/dalek-cryptography/bulletproofs
+Description: Errors related to proving and verifying MProvePlus and other proofs.
+
+*/
 
 extern crate alloc;
 

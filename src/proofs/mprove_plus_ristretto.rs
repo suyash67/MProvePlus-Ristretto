@@ -1,15 +1,14 @@
-#![allow(non_snake_case)]
-
 /*
 
-Copyright 2018 by Suyash Bagad, Saravanan Vijayakumaran
+Copyright 2020 by Suyash Bagad, Saravanan Vijayakumaran
 
-This file is part of revelioPlus library
-(<add a link to github>)
+This file is part of MProvePlus-Ristretto library
+Link: https://github.com/suyash67/MProvePlus-Ristretto
 
 */
 
-// based on the paper: <link to paper>
+#![allow(non_snake_case)]
+
 use Errors::{self, MProvePlusError};
 
 use curve25519_dalek::ristretto::{RistrettoPoint};
@@ -22,7 +21,6 @@ use alloc::vec;
 use merlin::Transcript;
 use core::iter;
 use sha2::Sha512;
-use libc_print::{libc_println};
 
 #[derive(Clone, Debug)]
 pub struct Constraints{
@@ -264,14 +262,11 @@ impl MProvePlus {
             )
             .collect();
 
-        libc_println!("till emat'");
-
         // generate key-images from I_vec_temp
         let I_vec = I_vec_temp;
 
         // generate commitment to total assets
         let gamma_Gt = Gt * gamma;
-        libc_println!("ready for C_res");
         let one_vec: Vec<Scalar> = (0..s).map(|_| Scalar::one()).collect();
         let C_res1 = RistrettoPoint::vartime_multiscalar_mul(one_vec.iter(), C_vec_temp.iter());
         let C_res = gamma_Gt + C_res1;
@@ -361,96 +356,6 @@ impl MProvePlus {
         let theta_inv = constraint_vec.theta_inv.clone();
         let alpha = constraint_vec.alpha.clone();
         let zeta = constraint_vec.zeta.clone();
-        let delta = constraint_vec.delta.clone();
-
-        // TODO: DEBUG STARTS
-        let y_s: Vec<Scalar> = util::exp_iter(y).take(s).collect();
-        let y_sn: Vec<Scalar> = util::exp_iter(y).take(sn).collect();
-        let y_n: Vec<Scalar> = util::exp_iter(y).take(n).collect();
-        let v_s: Vec<Scalar> = util::exp_iter(v).take(s).collect();
-        
-        let mut vs_kronecker_yn: Vec<Scalar> = y_n.clone();
-        let mut ones_kronecker_yn: Vec<Scalar> = y_n.clone();
-        let mut ys_kronecker_one: Vec<Scalar> = vec![Scalar::one(); n];
-        for i in 1..s {
-            let temp_vec: Vec<Scalar> = y_n.iter().map(|yi| yi * v_s[i]).collect();
-            vs_kronecker_yn.extend_from_slice(&temp_vec);
-            ones_kronecker_yn.extend_from_slice(&y_n);
-            ys_kronecker_one.extend_from_slice(&vec![y_s[i]; n]);
-        }
-
-        // v0
-        let mut v0: Vec<Scalar> = vec![v; 2*n+3];
-        v0.extend_from_slice(&vec![Scalar::zero(); s]);
-        v0.extend_from_slice(&y_sn);
-
-        // v1
-        let mut v1: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
-        v1.extend_from_slice(&y_s);
-        v1.extend_from_slice(&vec![Scalar::zero(); sn]);
-
-        // v2
-        let mut v2: Vec<Scalar> = vec![Scalar::one(); 1];
-        v2.extend_from_slice(&vec![Scalar::zero(); t-1]);
-
-        // v3
-        let minus_y_n: Vec<Scalar> = (0..n).map(|i| -y_n[i]).collect();
-        let mut v3: Vec<Scalar> = vec![Scalar::zero(); 3];
-        v3.extend_from_slice(&minus_y_n);
-        v3.extend_from_slice(&vec![Scalar::zero(); n+s]);
-        v3.extend_from_slice(&vs_kronecker_yn);
-
-        // v4
-        let mut v4: Vec<Scalar> = vec![Scalar::zero(); n+3];
-        v4.extend_from_slice(&minus_y_n);
-        v4.extend_from_slice(&vec![Scalar::zero(); s]);
-        v4.extend_from_slice(&ones_kronecker_yn);
-
-        // v5
-        let minus_y_pow_s = -util::scalar_exp_vartime(&y, s as u64);
-        let mut v5: Vec<Scalar> = vec![Scalar::zero(), minus_y_pow_s];
-        v5.extend_from_slice(&vec![Scalar::zero(); 2*n+s+1]);
-        v5.extend_from_slice(&ys_kronecker_one);
-
-        assert_eq!(minus_y_pow_s + util::scalar_exp_vartime(&y, s as u64), Scalar::zero(), "-y^s wrong");
-        libc_println!("ys_kron_1n: {:?}", ys_kronecker_one);
-        libc_println!("minus_y_pow_s * (-1): {:?}", minus_y_pow_s * (-Scalar::one()));
-        libc_println!("y_sq: {:?}", y*y);
-
-        libc_println!("E_mat: {:?}", E_mat);
-
-        let ones_ys: Scalar = y_s.iter().sum();
-        let ones_ys_1: Scalar = ones_ys + util::scalar_exp_vartime(&y, s as u64);
-
-        // v6
-        let mut v6: Vec<Scalar> = vec![Scalar::zero(); 2*n + s + 3];
-        v6.extend_from_slice(&y_sn);
-
-        // v7
-        let u_v_s: Vec<Scalar> = v_s.iter().zip(vec![u; s].iter()).map(|(vi, u)| vi * u).collect();
-        let mut v7: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
-        v7.extend_from_slice(&u_v_s);
-        v7.extend_from_slice(&vec![Scalar::zero(); sn]);
-
-        // delta
-    
-        let c0 = (0..t).map(|i| (c_L[i] * c_R[i]) * v0[i]).fold(Scalar::zero(), |acc, x| acc + x);
-        let c1 = (0..t).map(|i| (c_L[i] * c_R[i]) * v1[i]).fold(-ones_ys, |acc, x| acc + x);
-        let c2 = (0..t).map(|i| (c_L[i] * v2[i]) + (c_R[i] * v7[i])).fold(Scalar::zero(), |acc, x| acc + x);
-        let c3 = (0..t).map(|i| c_L[i]*v3[i]).fold(Scalar::zero(), |acc, x| acc + x);
-        let c4 = (0..t).map(|i| c_L[i]*v4[i]).fold(Scalar::zero(), |acc, x| acc + x);
-        let c5 = (0..t).map(|i| c_L[i]*v5[i]).fold(-ones_ys_1, |acc, x| acc + x);
-        let c6 = (0..t).map(|i| (c_L[i] + c_R[i] - Scalar::one())*v6[i]).fold(Scalar::zero(), |acc, x| acc + x);
-
-        assert_eq!(c0, Scalar::zero(), "c0 failed");
-        assert_eq!(c1, Scalar::zero(), "c1 failed");
-        assert_eq!(c2, Scalar::zero(), "c2 failed");
-        assert_eq!(c3, Scalar::zero(), "c3 failed");
-        assert_eq!(c4, Scalar::zero(), "c4 failed");
-        assert_eq!(c5, Scalar::zero(), "c5 failed");
-        assert_eq!(c6, Scalar::zero(), "c6 failed");
-
-        // TODO: DEBUG STOPS
         
         // calculate t2, t1, t0
         let t2 = (0..t).map(|i| (s_L[i] * s_R[i]) * theta[i]).fold(Scalar::zero(), |acc, x| acc + x);
@@ -823,7 +728,7 @@ mod tests {
                 if index < idx.len() {
                     if i == idx[index] {
                         // generate commitments using a_vec, r_vec
-                        C_vec_mut[i as usize] = pgens.commit(a_vec[i as usize], r_vec[i as usize]);
+                        C_vec_mut[i as usize] = pgens.commit(a_vec[index as usize], r_vec[index as usize]);
                         P_vec[i as usize] = G * x_vec[index];
                         C_res = C_res + C_vec_mut[i];
                         index = index + 1;

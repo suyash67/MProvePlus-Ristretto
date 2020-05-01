@@ -1,14 +1,14 @@
-#![allow(non_snake_case)]
 /*
 
-Copyright 2018 by Suyash Bagad, Saravanan Vijayakumaran
+Copyright 2020 by Suyash Bagad, Saravanan Vijayakumaran
 
-This file is part of revelioPlus library
-(<add a link to github>)
+This file is part of MProvePlus-Ristretto library
+Link: https://github.com/suyash67/MProvePlus-Ristretto
 
 */
 
-// based on the paper: <link to paper>
+#![allow(non_snake_case)]
+
 #![cfg_attr(not(feature = "std"), no_std)]
 extern crate alloc;
 

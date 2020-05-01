@@ -1,3 +1,12 @@
+/*
+
+Copyright (c) 2018 Chain, Inc.
+This file is a part of the bulletproofs package by dalek-cryptography.
+Link: https://github.com/dalek-cryptography/bulletproofs
+Description: Implements improved inner product argument from Bulletproofs paper.
+
+*/
+
 #![allow(non_snake_case)]
 
 extern crate alloc;
@@ -422,130 +431,131 @@ pub fn inner_product(a: &[Scalar], b: &[Scalar]) -> Scalar {
     out
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     use crate::util;
-//     use sha3::Sha3_512;
+    use crate::util;
+    use sha3::Sha3_512;
+    use alloc::vec;
 
-//     fn test_helper_create(n: usize) {
-//         let mut rng = rand::thread_rng();
+    fn test_helper_create(n: usize) {
+        let mut rng = rand::thread_rng();
 
-//         use crate::generators::BulletproofGens;
-//         let bp_gens = BulletproofGens::new(n, 1);
-//         let G: Vec<RistrettoPoint> = bp_gens.share(0).G(n).cloned().collect();
-//         let H: Vec<RistrettoPoint> = bp_gens.share(0).H(n).cloned().collect();
+        use crate::generators::BulletproofGens;
+        let bp_gens = BulletproofGens::new(n, 1);
+        let G: Vec<RistrettoPoint> = bp_gens.share(0).G(n).cloned().collect();
+        let H: Vec<RistrettoPoint> = bp_gens.share(0).H(n).cloned().collect();
 
-//         // Q would be determined upstream in the protocol, so we pick a random one.
-//         let Q = RistrettoPoint::hash_from_bytes::<Sha3_512>(b"test point");
+        // Q would be determined upstream in the protocol, so we pick a random one.
+        let Q = RistrettoPoint::hash_from_bytes::<Sha3_512>(b"test point");
 
-//         // a and b are the vectors for which we want to prove c = <a,b>
-//         let a: Vec<_> = (0..n).map(|_| Scalar::random(&mut rng)).collect();
-//         let b: Vec<_> = (0..n).map(|_| Scalar::random(&mut rng)).collect();
-//         let c = inner_product(&a, &b);
+        // a and b are the vectors for which we want to prove c = <a,b>
+        let a: Vec<_> = (0..n).map(|_| Scalar::random(&mut rng)).collect();
+        let b: Vec<_> = (0..n).map(|_| Scalar::random(&mut rng)).collect();
+        let c = inner_product(&a, &b);
 
-//         let G_factors: Vec<Scalar> = iter::repeat(Scalar::one()).take(n).collect();
+        let G_factors: Vec<Scalar> = iter::repeat(Scalar::one()).take(n).collect();
 
-//         // y_inv is (the inverse of) a random challenge
-//         let y_inv = Scalar::random(&mut rng);
-//         let H_factors: Vec<Scalar> = util::exp_iter(y_inv).take(n).collect();
+        // y_inv is (the inverse of) a random challenge
+        let y_inv = Scalar::random(&mut rng);
+        let H_factors: Vec<Scalar> = util::exp_iter(y_inv).take(n).collect();
 
-//         // P would be determined upstream, but we need a correct P to check the proof.
-//         //
-//         // To generate P = <a,G> + <b,H'> + <a,b> Q, compute
-//         //             P = <a,G> + <b',H> + <a,b> Q,
-//         // where b' = b \circ y^(-n)
-//         let b_prime = b.iter().zip(util::exp_iter(y_inv)).map(|(bi, yi)| bi * yi);
-//         // a.iter() has Item=&Scalar, need Item=Scalar to chain with b_prime
-//         let a_prime = a.iter().cloned();
+        // P would be determined upstream, but we need a correct P to check the proof.
+        //
+        // To generate P = <a,G> + <b,H'> + <a,b> Q, compute
+        //             P = <a,G> + <b',H> + <a,b> Q,
+        // where b' = b \circ y^(-n)
+        let b_prime = b.iter().zip(util::exp_iter(y_inv)).map(|(bi, yi)| bi * yi);
+        // a.iter() has Item=&Scalar, need Item=Scalar to chain with b_prime
+        let a_prime = a.iter().cloned();
 
-//         let P = RistrettoPoint::vartime_multiscalar_mul(
-//             a_prime.chain(b_prime).chain(iter::once(c)),
-//             G.iter().chain(H.iter()).chain(iter::once(&Q)),
-//         );
+        let P = RistrettoPoint::vartime_multiscalar_mul(
+            a_prime.chain(b_prime).chain(iter::once(c)),
+            G.iter().chain(H.iter()).chain(iter::once(&Q)),
+        );
 
-//         let mut verifier = Transcript::new(b"innerproducttest");
-//         let proof = InnerProductProof::create(
-//             &mut verifier,
-//             &Q,
-//             &G_factors,
-//             &H_factors,
-//             G.clone(),
-//             H.clone(),
-//             a.clone(),
-//             b.clone(),
-//         );
+        let mut verifier = Transcript::new(b"innerproducttest");
+        let proof = InnerProductProof::create(
+            &mut verifier,
+            &Q,
+            &G_factors,
+            &H_factors,
+            G.clone(),
+            H.clone(),
+            a.clone(),
+            b.clone(),
+        );
 
-//         let mut verifier = Transcript::new(b"innerproducttest");
-//         assert!(proof
-//             .verify(
-//                 n,
-//                 &mut verifier,
-//                 iter::repeat(Scalar::one()).take(n),
-//                 util::exp_iter(y_inv).take(n),
-//                 &P,
-//                 &Q,
-//                 &G,
-//                 &H
-//             )
-//             .is_ok());
+        let mut verifier = Transcript::new(b"innerproducttest");
+        assert!(proof
+            .verify(
+                n,
+                &mut verifier,
+                iter::repeat(Scalar::one()).take(n),
+                util::exp_iter(y_inv).take(n),
+                &P,
+                &Q,
+                &G,
+                &H
+            )
+            .is_ok());
 
-//         let proof = InnerProductProof::from_bytes(proof.to_bytes().as_slice()).unwrap();
-//         let mut verifier = Transcript::new(b"innerproducttest");
-//         assert!(proof
-//             .verify(
-//                 n,
-//                 &mut verifier,
-//                 iter::repeat(Scalar::one()).take(n),
-//                 util::exp_iter(y_inv).take(n),
-//                 &P,
-//                 &Q,
-//                 &G,
-//                 &H
-//             )
-//             .is_ok());
-//     }
+        let proof = InnerProductProof::from_bytes(proof.to_bytes().as_slice()).unwrap();
+        let mut verifier = Transcript::new(b"innerproducttest");
+        assert!(proof
+            .verify(
+                n,
+                &mut verifier,
+                iter::repeat(Scalar::one()).take(n),
+                util::exp_iter(y_inv).take(n),
+                &P,
+                &Q,
+                &G,
+                &H
+            )
+            .is_ok());
+    }
 
-//     #[test]
-//     fn make_ipp_1() {
-//         test_helper_create(1);
-//     }
+    #[test]
+    fn make_ipp_1() {
+        test_helper_create(1);
+    }
 
-//     #[test]
-//     fn make_ipp_2() {
-//         test_helper_create(2);
-//     }
+    #[test]
+    fn make_ipp_2() {
+        test_helper_create(2);
+    }
 
-//     #[test]
-//     fn make_ipp_4() {
-//         test_helper_create(4);
-//     }
+    #[test]
+    fn make_ipp_4() {
+        test_helper_create(4);
+    }
 
-//     #[test]
-//     fn make_ipp_32() {
-//         test_helper_create(32);
-//     }
+    #[test]
+    fn make_ipp_32() {
+        test_helper_create(32);
+    }
 
-//     #[test]
-//     fn make_ipp_64() {
-//         test_helper_create(64);
-//     }
+    #[test]
+    fn make_ipp_64() {
+        test_helper_create(64);
+    }
 
-//     #[test]
-//     fn test_inner_product() {
-//         let a = vec![
-//             Scalar::from(1u64),
-//             Scalar::from(2u64),
-//             Scalar::from(3u64),
-//             Scalar::from(4u64),
-//         ];
-//         let b = vec![
-//             Scalar::from(2u64),
-//             Scalar::from(3u64),
-//             Scalar::from(4u64),
-//             Scalar::from(5u64),
-//         ];
-//         assert_eq!(Scalar::from(40u64), inner_product(&a, &b));
-//     }
-// }
+    #[test]
+    fn test_inner_product() {
+        let a = vec![
+            Scalar::from(1u64),
+            Scalar::from(2u64),
+            Scalar::from(3u64),
+            Scalar::from(4u64),
+        ];
+        let b = vec![
+            Scalar::from(2u64),
+            Scalar::from(3u64),
+            Scalar::from(4u64),
+            Scalar::from(5u64),
+        ];
+        assert_eq!(Scalar::from(40u64), inner_product(&a, &b));
+    }
+}

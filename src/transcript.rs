@@ -1,4 +1,11 @@
-//! Defines a `TranscriptProtocol` trait for using a Merlin transcript.
+/*
+
+Copyright (c) 2018 Chain, Inc.
+This file is a part of the bulletproofs package by dalek-cryptography.
+Link: https://github.com/dalek-cryptography/bulletproofs
+Description: Defines a `TranscriptProtocol` trait for using a Merlin transcript.
+
+*/
 
 use curve25519_dalek::ristretto::CompressedRistretto;
 use curve25519_dalek::scalar::Scalar;
