@@ -8,6 +8,7 @@ Description: Constructing generators for aggregated bulletproofs.
 */
 
 #![allow(non_snake_case)]
+#![allow(dead_code)]
 
 extern crate alloc;
 

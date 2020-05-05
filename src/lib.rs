@@ -8,6 +8,7 @@ Link: https://github.com/suyash67/MProvePlus-Ristretto
 */
 
 #![allow(non_snake_case)]
+#![allow(unused_imports)]
 
 #![cfg_attr(not(feature = "std"), no_std)]
 extern crate alloc;
