@@ -283,15 +283,27 @@ impl MProvePlus {
 
         // define compressed stmt Y_hat_vec
         let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| P_vec[i] * u).collect();
-
+        // let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| 
+        //     RistrettoPoint::vartime_multiscalar_mul(&[u.clone()], &[P_vec[i]])
+        // ).collect();
+        
         let u_square = u*u;
         let minus_u_sq = -u_square;
         let H_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| H_vec[i] * u_square).collect();
+        // let H_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| 
+        //     RistrettoPoint::vartime_multiscalar_mul(&[u_square.clone()], &[H_vec[i]])
+        // ).collect();
         
         let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| H_vec_temp[i] + P_vec_temp[i]).collect();
+        // let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| 
+        //     RistrettoPoint::vartime_multiscalar_mul(&[Scalar::one(), Scalar::one()], &[P_vec_temp[i], H_vec_temp[i]])
+        // ).collect();
 
         // define compressed I_hat_vec
         let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| I_vec[i] * (minus_u_sq * v_s[i])).collect();
+        // let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| 
+        //     RistrettoPoint::vartime_multiscalar_mul(&[minus_u_sq * v_s[i]], &[I_vec[i]])
+        // ).collect();
 
         // define x_inv_vec
         let x_inv_vec: Vec<Scalar> = (0..s).map(|i| x_vec[i].invert()).collect();
@@ -540,17 +552,29 @@ impl MProvePlus {
         // towards verification eqn #3
         // define compressed stmt Y_hat_vec
         let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| P_vec[i] * u).collect();
+        // let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| 
+        //     RistrettoPoint::vartime_multiscalar_mul(&[u.clone()], &[P_vec[i]])
+        // ).collect();
         
         let u_square = u*u;
         let minus_u_sq = -u_square;
         let H_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| H_vec[i] * u_square).collect();
+        // let H_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| 
+        //     RistrettoPoint::vartime_multiscalar_mul(&[u_square.clone()], &[H_vec[i]])
+        // ).collect();
         
         let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| H_vec_temp[i] + P_vec_temp[i]).collect();
+        // let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| 
+        //     RistrettoPoint::vartime_multiscalar_mul(&[Scalar::one(), Scalar::one()], &[P_vec_temp[i], H_vec_temp[i]])
+        // ).collect();
 
         // define compressed I_hat_vec
         let v_s: Vec<Scalar> = util::exp_iter(v).take(s).collect();
-        let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| self.I_vec[i] * minus_u_sq * v_s[i]).collect();  
-        
+        let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| self.I_vec[i] * (minus_u_sq * v_s[i])).collect();
+        // let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| 
+        //     RistrettoPoint::vartime_multiscalar_mul(&[minus_u_sq * v_s[i]], &[self.I_vec[i]])
+        // ).collect();
+
         // defining g_w
         let mut g_vec_w: Vec<RistrettoPoint> = vec![*G, self.C_res, *Gt];
         g_vec_w.extend_from_slice(&Y_hat_vec);
