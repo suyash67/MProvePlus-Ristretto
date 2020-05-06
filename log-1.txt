@@ -1,0 +1,549 @@
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.47s
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.06s
+     Running `target/release/mprove_plus_ristretto_bin 250 200 -n 1`
+Total simulation time = Duration { secs: 16, nanos: 634424203 }
+Options = Opt { anon_list_size: 250, own_list_size: 200, num_iter: 1 }
+Average proof generation time = 14.45
+Average proof verification time = 2.182
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.06s
+     Running `target/release/mprove_plus_ristretto_bin 500 200 -n 1`
+Total simulation time = Duration { secs: 33, nanos: 704001922 }
+Options = Opt { anon_list_size: 500, own_list_size: 200, num_iter: 1 }
+Average proof generation time = 29.538
+Average proof verification time = 4.163
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.12s
+     Running `target/release/mprove_plus_ristretto_bin 1000 200 -n 1`
+
+Total simulation time = Duration { secs: 66, nanos: 262343010 }
+Options = Opt { anon_list_size: 1000, own_list_size: 200, num_iter: 1 }
+Average proof generation time = 58.174
+Average proof verification time = 8.081
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.11s
+     Running `target/release/mprove_plus_ristretto_bin 2500 200 -n 1`
+Total simulation time = Duration { secs: 148, nanos: 316388265 }
+Options = Opt { anon_list_size: 2500, own_list_size: 200, num_iter: 1 }
+Average proof generation time = 129.454
+Average proof verification time = 18.843
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.09s
+     Running `target/release/mprove_plus_ristretto_bin 5000 200 -n 1`
+Total simulation time = Duration { secs: 294, nanos: 387097033 }
+Options = Opt { anon_list_size: 5000, own_list_size: 200, num_iter: 1 }
+Average proof generation time = 257.165
+Average proof verification time = 37.205
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.07s
+     Running `target/release/mprove_plus_ristretto_bin 10000 200 -n 1`
+
+
+
+
+Total simulation time = Duration { secs: 593, nanos: 686913288 }
+Options = Opt { anon_list_size: 10000, own_list_size: 200, num_iter: 1 }
+Average proof generation time = 517.897
+Average proof verification time = 75.734
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.32s
+     Running `target/release/mprove_plus_ristretto_bin 25000 200 -n 1`
+
+
+Total simulation time = Duration { secs: 2165, nanos: 990341497 }
+Options = Opt { anon_list_size: 25000, own_list_size: 200, num_iter: 1 }
+Average proof generation time = 1867.129
+Average proof verification time = 298.841
+warning: unused `#[macro_use]` import
+  --> src/lib.rs:15:1
+   |
+15 | #[macro_use]
+   | ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: associated function is never used: `to_bytes_iter`
+   --> src/proofs/inner_product.rs:365:5
+    |
+365 |     pub(crate) fn to_bytes_iter(&self) -> impl Iterator<Item = u8> + '_ {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:213:5
+    |
+213 |     pub(crate) fn G(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:224:5
+    |
+224 |     pub(crate) fn H(&self, n: usize, m: usize) -> impl Iterator<Item = &RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `gens`
+   --> src/generators.rs:278:5
+    |
+278 |     gens: &'a BulletproofGens,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field is never read: `share`
+   --> src/generators.rs:280:5
+    |
+280 |     share: usize,
+    |     ^^^^^^^^^^^^
+
+warning: associated function is never used: `G`
+   --> src/generators.rs:285:5
+    |
+285 |     pub(crate) fn G(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function is never used: `H`
+   --> src/generators.rs:290:5
+    |
+290 |     pub(crate) fn H(&self, n: usize) -> impl Iterator<Item = &'a RistrettoPoint> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: 8 warnings emitted
+
+    Finished release [optimized] target(s) in 0.44s
+     Running `target/release/mprove_plus_ristretto_bin 50000 200 -n 1`
+
+Total simulation time = Duration { secs: 4526, nanos: 765760943 }
+Options = Opt { anon_list_size: 50000, own_list_size: 200, num_iter: 1 }
+Average proof generation time = 3948.129
+Average proof verification time = 578.584
+   Compiling mProvePlus-ristretto v0.1.0 (/Users/piyushbagad/projects/suyash/MProvePlus-Ristretto)
+    Finished release [optimized] target(s) in 7.66s
+     Running `target/release/mprove_plus_ristretto_bin 100000 200 -n 1`
+Options = Opt { anon_list_size: 100000, own_list_size: 200, num_iter: 1 }
+Max estimated time: 43073.536
+

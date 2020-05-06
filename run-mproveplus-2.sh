@@ -22,3 +22,6 @@ cargo run --release --bin mprove_plus_ristretto_bin 10000 500 -n 1
 cargo run --release --bin mprove_plus_ristretto_bin 10000 1000 -n 1
 cargo run --release --bin mprove_plus_ristretto_bin 10000 2000 -n 1
 cargo run --release --bin mprove_plus_ristretto_bin 10000 5000 -n 1
+cargo run --release --bin mprove_plus_ristretto_bin 100000 200 -n 1
+cargo run --release --bin mprove_plus_ristretto_bin 250000 200 -n 1
+
