@@ -76,7 +76,10 @@ impl Constraints{
 
         // v0
         let mut v0: Vec<Scalar> = Vec::with_capacity(t);
-        v0.extend_from_slice(&vec![v; 2*n+3]);
+        let one = Scalar::one();
+        // v0.extend_from_slice(&vec![v; 2*n+3]);
+        // changing v to one for lesser group operations
+        v0.extend_from_slice(&vec![one; 2*n+3]);
         // let mut v0: Vec<Scalar> = vec![v; 2*n+3];
         v0.extend_from_slice(&vec![Scalar::zero(); s]);
         v0.extend_from_slice(&y_sn);
