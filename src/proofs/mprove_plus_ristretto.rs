@@ -56,9 +56,17 @@ impl Constraints{
         let y_sn: Vec<Scalar> = util::exp_iter(y).take(sn).collect();
         let y_n: Vec<Scalar> = util::exp_iter(y).take(n).collect();
         let v_s: Vec<Scalar> = util::exp_iter(v).take(s).collect();
-        let mut vs_kronecker_yn: Vec<Scalar> = y_n.clone();
-        let mut ones_kronecker_yn: Vec<Scalar> = y_n.clone();
-        let mut ys_kronecker_one: Vec<Scalar> = vec![Scalar::one(); n];
+        // let mut vs_kronecker_yn: Vec<Scalar> = y_n.clone();
+        let mut vs_kronecker_yn: Vec<Scalar> = Vec::with_capacity(sn);
+        vs_kronecker_yn.extend_from_slice(&y_n.as_slice());
+        
+        // let mut ones_kronecker_yn: Vec<Scalar> = y_n.clone();
+        let mut ones_kronecker_yn: Vec<Scalar> = Vec::with_capacity(sn);
+        ones_kronecker_yn.extend_from_slice(y_n.as_slice());
+
+        // let mut ys_kronecker_one: Vec<Scalar> = vec![Scalar::one(); n];
+        let mut ys_kronecker_one: Vec<Scalar> = Vec::with_capacity(sn);
+        ys_kronecker_one.extend_from_slice(&vec![Scalar::one(); n]);
         for i in 1..s {
             let temp_vec: Vec<Scalar> = y_n.iter().map(|yi| yi * v_s[i]).collect();
             vs_kronecker_yn.extend_from_slice(&temp_vec);
@@ -67,45 +75,61 @@ impl Constraints{
         }
 
         // v0
-        let mut v0: Vec<Scalar> = vec![v; 2*n+3];
+        let mut v0: Vec<Scalar> = Vec::with_capacity(t);
+        v0.extend_from_slice(&vec![v; 2*n+3]);
+        // let mut v0: Vec<Scalar> = vec![v; 2*n+3];
         v0.extend_from_slice(&vec![Scalar::zero(); s]);
         v0.extend_from_slice(&y_sn);
 
         // v1
-        let mut v1: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
+        let mut v1: Vec<Scalar> = Vec::with_capacity(t);
+        v1.extend_from_slice(&vec![Scalar::zero(); 2*n+3]);
+        // let mut v1: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
         v1.extend_from_slice(&y_s);
         v1.extend_from_slice(&vec![Scalar::zero(); sn]);
 
         // v2
-        let mut v2: Vec<Scalar> = vec![Scalar::one(); 1];
+        let mut v2: Vec<Scalar> = Vec::with_capacity(t);
+        v2.push(Scalar::one());
+        // let mut v2: Vec<Scalar> = vec![Scalar::one(); 1];
         v2.extend_from_slice(&vec![Scalar::zero(); t-1]);
 
         // v3
+        let mut v3: Vec<Scalar> = Vec::with_capacity(t);
         let minus_y_n: Vec<Scalar> = (0..n).map(|i| -y_n[i]).collect();
-        let mut v3: Vec<Scalar> = vec![Scalar::zero(); 3];
+        // let mut v3: Vec<Scalar> = vec![Scalar::zero(); 3];
+        v3.extend_from_slice(&vec![Scalar::zero(); 3]);
         v3.extend_from_slice(&minus_y_n);
         v3.extend_from_slice(&vec![Scalar::zero(); n+s]);
         v3.extend_from_slice(&vs_kronecker_yn);
 
         // v4
-        let mut v4: Vec<Scalar> = vec![Scalar::zero(); n+3];
+        let mut v4: Vec<Scalar> = Vec::with_capacity(t);
+        v4.extend_from_slice(&vec![Scalar::zero(); n+3]);
+        // let mut v4: Vec<Scalar> = vec![Scalar::zero(); n+3];
         v4.extend_from_slice(&minus_y_n);
         v4.extend_from_slice(&vec![Scalar::zero(); s]);
         v4.extend_from_slice(&ones_kronecker_yn);
 
         // v5
+        let mut v5: Vec<Scalar> = Vec::with_capacity(t);
         let minus_y_pow_s = -util::scalar_exp_vartime(&y, s as u64);
-        let mut v5: Vec<Scalar> = vec![Scalar::zero(), minus_y_pow_s];
+        v5.extend_from_slice(&vec![Scalar::zero(), minus_y_pow_s]);
+        // let mut v5: Vec<Scalar> = vec![Scalar::zero(), minus_y_pow_s];
         v5.extend_from_slice(&vec![Scalar::zero(); 2*n+s+1]);
         v5.extend_from_slice(&ys_kronecker_one);
 
         // v6
-        let mut v6: Vec<Scalar> = vec![Scalar::zero(); 2*n + s + 3];
+        let mut v6: Vec<Scalar> = Vec::with_capacity(t);
+        v6.extend_from_slice(&vec![Scalar::zero(); 2*n + s + 3]);
+        // let mut v6: Vec<Scalar> = vec![Scalar::zero(); 2*n + s + 3];
         v6.extend_from_slice(&y_sn);
 
         // v7
+        let mut v7: Vec<Scalar> = Vec::with_capacity(t);
+        v7.extend_from_slice(&vec![Scalar::zero(); 2*n+3]);
         let u_v_s: Vec<Scalar> = v_s.iter().zip(vec![u; s].iter()).map(|(vi, u)| vi * u).collect();
-        let mut v7: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
+        // let mut v7: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
         v7.extend_from_slice(&u_v_s);
         v7.extend_from_slice(&vec![Scalar::zero(); sn]);
 
@@ -212,7 +236,7 @@ impl MProvePlus {
         let t = s*n + 2*n + s + 3;
 
         // transcript used for generating challenges
-        let mut transcript: Vec<u8> = Vec::new();
+        let mut transcript: Vec<u8> = Vec::with_capacity(1000);
 
         // other prelims
         let p_len = 2*n + s + 3;
@@ -314,7 +338,9 @@ impl MProvePlus {
 
         // secret vectors
         // c L := ( ξ || − 1 || γ || ê || e' || x^◦−1 || vec(E))
-        let mut c_L: Vec<Scalar> = vec![xi.clone()];
+        let mut c_L: Vec<Scalar> = Vec::with_capacity(t);
+        c_L.push(xi.clone());
+        // let mut c_L: Vec<Scalar> = vec![xi.clone()];
         c_L.push(-Scalar::one());
         c_L.push(*gamma);
         c_L.extend_from_slice(&e_hat.clone());
@@ -323,12 +349,14 @@ impl MProvePlus {
         c_L.extend_from_slice(&E_mat.clone());
         
         // c R := (0^2n+3 || x || vec(E) − 1^sn )
-        let mut c_R: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
+        let mut c_R: Vec<Scalar> = Vec::with_capacity(t);
+        c_R.extend_from_slice(&vec![Scalar::zero(); 2*n+3]);
+        // let mut c_R: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
         c_R.extend_from_slice(&x_vec);
         c_R.extend_from_slice(&E_mat_comp);
     
         // defining g_0
-        let mut g_vec_0: Vec<RistrettoPoint> = Vec::new();
+        let mut g_vec_0: Vec<RistrettoPoint> = Vec::with_capacity(t);
         g_vec_0.extend_from_slice(&p_vec);
         g_vec_0.extend_from_slice(&g_prime_vec);
 
@@ -346,7 +374,9 @@ impl MProvePlus {
         let w = Scalar::hash_from_bytes::<Sha512>(&transcript);
 
         // defining g_w
-        let mut g_vec_w: Vec<RistrettoPoint> = vec![*G, C_res, *Gt];
+        let mut g_vec_w: Vec<RistrettoPoint> = Vec::with_capacity(t);
+        g_vec_w.extend_from_slice(&vec![*G, C_res, *Gt]);
+        // let mut g_vec_w: Vec<RistrettoPoint> = vec![*G, C_res, *Gt];
         g_vec_w.extend_from_slice(&Y_hat_vec);
         g_vec_w.extend_from_slice(&C_vec);
         g_vec_w.extend_from_slice(&I_hat_vec);
@@ -427,19 +457,27 @@ impl MProvePlus {
         let zero_append_vec = vec![Scalar::zero();res];
 
         // Append 0s to secret vectors
-        let mut a = Lp.clone();
-        let mut b = Rp.clone();
+        let mut a: Vec<Scalar> = Vec::with_capacity(N);
+        let mut b: Vec<Scalar> = Vec::with_capacity(N);
+        // let mut a = Lp.clone();
+        // let mut b = Rp.clone();
+        a.extend_from_slice(&Lp);
+        b.extend_from_slice(&Rp);
         a.extend_from_slice(&zero_append_vec);
         b.extend_from_slice(&zero_append_vec);
 
         // Multipliers of base vectors
         let G_factors: Vec<Scalar> = iter::repeat(Scalar::one()).take(N).collect();
-        let mut H_factors: Vec<Scalar> = theta_inv.clone();
+        let mut H_factors: Vec<Scalar> = Vec::with_capacity(N);
+        // let mut H_factors: Vec<Scalar> = theta_inv.clone();
+        H_factors.extend_from_slice(&theta_inv);
         H_factors.extend_from_slice(&vec![Scalar::one(); res]);
 
         // Append random group generators to g_vec_w and hi_tag        
-        let mut g_vec_long = g_vec_w.clone();
+        // let mut g_vec_long = g_vec_w.clone();
+        let mut g_vec_long: Vec<RistrettoPoint> = Vec::with_capacity(N);
         let mut h_vec_long: Vec<RistrettoPoint> = Vec::with_capacity(N);
+        g_vec_long.extend_from_slice(&g_vec_w);
         g_vec_long.extend_from_slice(&g_vec_append);
         h_vec_long.extend_from_slice(&h_vec);
         h_vec_long.extend_from_slice(&h_vec_append);
@@ -498,7 +536,7 @@ impl MProvePlus {
         let res = N-t;
 
         // transcript initialization
-        let mut transcript: Vec<u8> = Vec::new();
+        let mut transcript: Vec<u8> = Vec::with_capacity(1000);
 
         // re-generate challenges u, v, y, z
         transcript.extend_from_slice(G.compress().as_bytes());
@@ -576,7 +614,9 @@ impl MProvePlus {
         // ).collect();
 
         // defining g_w
-        let mut g_vec_w: Vec<RistrettoPoint> = vec![*G, self.C_res, *Gt];
+        let mut g_vec_w: Vec<RistrettoPoint> = Vec::with_capacity(t);
+        g_vec_w.extend_from_slice(&vec![*G, self.C_res, *Gt]);
+        // let mut g_vec_w: Vec<RistrettoPoint> = vec![*G, self.C_res, *Gt];
         g_vec_w.extend_from_slice(&Y_hat_vec);
         g_vec_w.extend_from_slice(&C_vec);
         g_vec_w.extend_from_slice(&I_hat_vec);
@@ -595,18 +635,22 @@ impl MProvePlus {
             alpha.iter().chain(beta.iter()).chain(iter::once(&self.t_hat)).chain(iter::once(&x)).chain(iter::once(&minus_r)).chain(iter::once(&Scalar::one())),
             g_vec_w.iter().chain(h_vec.iter()).chain(iter::once(&Q)).chain(iter::once(&self.S)).chain(iter::once(H_prime)).chain(iter::once(&self.A)),
         );
-        
-        // Append random group generators (same as prover's) to g_vec_w and hi_tag
-        let mut g_vec_long = g_vec_w.clone();
-        let mut h_vec_long: Vec<RistrettoPoint> = Vec::with_capacity(N);
-        g_vec_long.extend_from_slice(&g_vec_append);
-        h_vec_long.extend_from_slice(&h_vec);
-        h_vec_long.extend_from_slice(&h_vec_append);
 
         // Multipliers of base vectors
         let G_factors: Vec<Scalar> = iter::repeat(Scalar::one()).take(N).collect();
-        let mut H_factors: Vec<Scalar> = theta_inv.clone();
+        let mut H_factors: Vec<Scalar> = Vec::with_capacity(N);
+        // let mut H_factors: Vec<Scalar> = theta_inv.clone();
+        H_factors.extend_from_slice(&theta_inv);
         H_factors.extend_from_slice(&vec![Scalar::one(); res]);
+
+        // Append random group generators (same as prover's) to g_vec_w and hi_tag        
+        // let mut g_vec_long = g_vec_w.clone();
+        let mut g_vec_long: Vec<RistrettoPoint> = Vec::with_capacity(N);
+        let mut h_vec_long: Vec<RistrettoPoint> = Vec::with_capacity(N);
+        g_vec_long.extend_from_slice(&g_vec_w);
+        g_vec_long.extend_from_slice(&g_vec_append);
+        h_vec_long.extend_from_slice(&h_vec);
+        h_vec_long.extend_from_slice(&h_vec_append);
 
         let mut verifier = Transcript::new(b"innerproduct");
         let verify = self.inner_product_proof.verify(N, &mut verifier, &G_factors,
