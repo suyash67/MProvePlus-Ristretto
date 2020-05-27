@@ -140,7 +140,11 @@ impl Constraints{
         let theta: Vec<Scalar> = v0.iter().zip(v1.iter()).map(|(v0i, v1i)| v0i + z * v1i).collect();
        
         // theta_inv
-        let theta_inv: Vec<Scalar> = theta.iter().map(|thetai| thetai.invert()).collect();
+        // theta_inv is set as 1 where theta is 0
+        let mut theta_inv: Vec<Scalar> = Vec::with_capacity(t);
+        theta_inv.extend_from_slice(&vec![one; 2*n+3]);
+        let theta_inv_ext: Vec<Scalar> = theta[2*n+3..].iter().map(|thetai| thetai.invert()).collect();
+        theta_inv.extend_from_slice(&theta_inv_ext);
 
         // zeta
         let z2 = util::scalar_exp_vartime(&z, 2);
@@ -394,12 +398,19 @@ impl MProvePlus {
         // P -> V: S
         // S = (H' * r_s) + <g_w * s_L> + <h * s_R>
         let r_S = Scalar::random(&mut rng);
-        let s_R = (0..t).map(|_| Scalar::random(&mut rng)).collect::<Vec<Scalar>>();
+        // let s_R = (0..t).map(|_| Scalar::random(&mut rng)).collect::<Vec<Scalar>>();
         let s_L = (0..t).map(|_| Scalar::random(&mut rng)).collect::<Vec<Scalar>>();
+
+        // s_R[j]=0 if c_R[j]=0, else a random scalar
+        let mut s_R: Vec<Scalar> = Vec::with_capacity(t);
+        s_R.extend_from_slice(&vec![Scalar::zero(); 2*n + 3]);
+        let s_R_ext = (0..s+sn).map(|_| Scalar::random(&mut rng)).collect::<Vec<Scalar>>();
+        s_R.extend_from_slice(&s_R_ext);
 
         let H_prime_r_S = H_prime * r_S;
         let sL_gw = (0..t).map(|i| g_vec_w[i] * s_L[i]).fold(H_prime_r_S, |acc, x| acc + x);
-        let S = (0..t).map(|i| h_vec[i] * s_R[i]).fold(sL_gw, |acc, x| acc + x);
+        // s_R*H computation only for non-zero positions
+        let S = (2*n+3..t).map(|i| h_vec[i] * s_R[i]).fold(sL_gw, |acc, x| acc + x);
 
         // challenges y,z
         transcript.extend_from_slice(S.compress().as_bytes());
