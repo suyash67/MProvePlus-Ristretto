@@ -67,8 +67,9 @@ impl Constraints{
         // let mut ys_kronecker_one: Vec<Scalar> = vec![Scalar::one(); n];
         let mut ys_kronecker_one: Vec<Scalar> = Vec::with_capacity(sn);
         ys_kronecker_one.extend_from_slice(&vec![Scalar::one(); n]);
+        let mut temp_vec;
         for i in 1..s {
-            let temp_vec: Vec<Scalar> = y_n.iter().map(|yi| yi * v_s[i]).collect();
+            temp_vec = y_n.iter().map(|yi| yi * v_s[i]).collect::<Vec<Scalar>>();
             vs_kronecker_yn.extend_from_slice(&temp_vec);
             ones_kronecker_yn.extend_from_slice(&y_n);
             ys_kronecker_one.extend_from_slice(&vec![y_s[i]; n]);
@@ -744,9 +745,10 @@ impl MProvePlus {
         let setsize = n / s;
         let mut start_idx = 0;
         let mut end_idx = cmp::max(1, setsize-1);
+        let mut dist1 = Uniform::from(0..2);
         let idx = (0..s).map(|_| {
             
-            let dist1 = Uniform::from(start_idx..end_idx);
+            dist1 = Uniform::from(start_idx..end_idx);
             start_idx = setsize + start_idx;
             end_idx =  cmp::min(n-1, end_idx + setsize);
 
