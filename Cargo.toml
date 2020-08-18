@@ -29,3 +29,8 @@ time = { version = "0.1.25"}
 [dev-dependencies]
 criterion = "0.2"
 
+[[bench]]
+name = "mproveplus_bench"
+path = "benches/mproveplus_bench.rs"
+harness = false
+
