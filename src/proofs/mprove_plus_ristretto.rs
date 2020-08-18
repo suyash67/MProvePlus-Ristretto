@@ -10,6 +10,7 @@ Link: https://github.com/suyash67/MProvePlus-Ristretto
 #![allow(non_snake_case)]
 
 use Errors::{self, MProvePlusError};
+use crate::errors::ProofError;
 
 use curve25519_dalek::ristretto::{RistrettoPoint};
 use curve25519_dalek::traits::VartimeMultiscalarMul;
@@ -26,6 +27,8 @@ use rand::distributions::{Distribution, Uniform};
 use rand::Rng;
 use curve25519_dalek::constants;
 use crate::generators::{PedersenGens};
+use alloc::borrow::Borrow;
+use libc_print::{libc_println};
 
 #[derive(Clone, Debug)]
 pub struct Constraints{
@@ -679,6 +682,233 @@ impl MProvePlus {
         }
     }
 
+    pub fn fast_verify(
+        &self,
+        // crs
+        G: &RistrettoPoint,
+        H: &RistrettoPoint,
+        Gt: &RistrettoPoint, // instead of G1
+        H_prime: &RistrettoPoint,
+        p_vec: &[RistrettoPoint],
+        g_prime_vec: &[RistrettoPoint],
+        h_vec: &[RistrettoPoint],
+        g_vec_append: &[RistrettoPoint],
+        h_vec_append: &[RistrettoPoint],
+        // stmt
+        C_vec: &[RistrettoPoint], // vector of commitments
+        P_vec: &[RistrettoPoint], // addresses in the ring (public keys)
+        H_vec: &[RistrettoPoint], // hash of addresses
+    ) -> Result<(), Errors> {
+
+        // vector lengths
+        let n = C_vec.len();
+        let s = self.I_vec.len();
+        let t = s*n + 2*n + s + 3;
+        let N = t.next_power_of_two();
+        let res = N-t;
+
+        // transcript initialization
+        let mut transcript: Vec<u8> = Vec::with_capacity(1000);
+
+        // re-generate challenges u, v, y, z
+        transcript.extend_from_slice(G.compress().as_bytes());
+        let u = Scalar::hash_from_bytes::<Sha512>(&transcript);
+        transcript.extend_from_slice(H.compress().as_bytes());
+        let v = Scalar::hash_from_bytes::<Sha512>(&transcript);
+
+        // re-generate challenge w and compute Q
+        transcript.extend_from_slice(self.A.compress().as_bytes());
+        let w = Scalar::hash_from_bytes::<Sha512>(&transcript);
+        let Q = RistrettoPoint::hash_from_bytes::<Sha512>(b"test point");
+
+        // re-generate challenge y, z
+        transcript.extend_from_slice(self.S.compress().as_bytes());
+        let y = Scalar::hash_from_bytes::<Sha512>(&transcript);
+        transcript.extend_from_slice(self.S.compress().as_bytes());
+        let z = Scalar::hash_from_bytes::<Sha512>(&transcript);
+
+        // re-generate challenge x
+        transcript.extend_from_slice(self.T1.compress().as_bytes());
+        transcript.extend_from_slice(self.T2.compress().as_bytes());
+        let x = Scalar::hash_from_bytes::<Sha512>(&transcript);
+
+        // generate scalar c for combining verification equations
+        transcript.extend_from_slice(self.T2.compress().as_bytes());
+        let c = Scalar::hash_from_bytes::<Sha512>(&transcript);
+
+        // build constraint vectors
+        let constraint_vec1 = Constraints::generate_constraints(u,v,y,z,n,s);
+        let theta_inv = constraint_vec1.theta_inv.clone();
+        let alpha = constraint_vec1.alpha.clone();
+        let delta = constraint_vec1.delta.clone();
+        let beta = constraint_vec1.beta.clone();
+
+        // compute sg_vec and sh_vec
+        let mut verifier = Transcript::new(b"innerproduct");
+        let (u_sq, u_inv_sq, s_vec) = InnerProductProof::verification_scalars(
+            &self.inner_product_proof, 
+            N, 
+            &mut verifier)
+            .expect(
+                "Issues in the input inner product argument encountered!"
+            );
+
+        // compute exponent of g_vec_w
+        let mut alpha_ext = Vec::with_capacity(N);
+        alpha_ext.extend_from_slice(&alpha);
+        alpha_ext.extend_from_slice(&vec![Scalar::zero(); res]);        
+
+        let a_s_minus_alpha: Vec<Scalar> = alpha_ext
+            .into_iter()
+            .zip(s_vec.iter())
+            .map(|(alpha_i, s_i)| (self.inner_product_proof.a * s_i) - alpha_i.borrow())
+            .take(N)
+            .collect();
+
+        let mut scalar_gw = Vec::with_capacity(N);
+        scalar_gw.push(&w * a_s_minus_alpha[0]);
+        scalar_gw.push(&w * a_s_minus_alpha[1]);
+        scalar_gw.push(&w * a_s_minus_alpha[2]);
+        
+        let wu = &w * &u;
+        let wu_sq = &wu * &u;
+        let minus_wu_sq = -&wu_sq;
+        let scalar_P_vec: Vec<Scalar> = (0..n).map(|i| &wu * a_s_minus_alpha[3+i]).collect();
+        let scalar_H_vec: Vec<Scalar> = (0..n).map(|i| &wu_sq * a_s_minus_alpha[3+i]).collect();
+        let scalar_C_vec: Vec<Scalar> = (0..n).map(|i| &w * a_s_minus_alpha[n+3+i]).collect();
+
+        let v_s: Vec<Scalar> = util::exp_iter(v).take(s).collect();
+        let scalar_I_vec: Vec<Scalar> = (0..s)
+            .map(|i| {
+                let minus_wu_sq_vi = &minus_wu_sq * v_s[i];
+                &minus_wu_sq_vi * a_s_minus_alpha[2*n+3+i]
+            })
+            .collect();
+
+        let scalar_p_vec: Vec<Scalar> = a_s_minus_alpha[0..(2*n+s+3)].to_vec();
+        let scalar_g_prime_vec: Vec<Scalar> = a_s_minus_alpha[(2*n+s+3)..t].to_vec();
+        let scalar_g_extend_vec: Vec<Scalar> = a_s_minus_alpha[t..N].to_vec();
+
+        scalar_gw.extend_from_slice(&scalar_P_vec);
+        scalar_gw.extend_from_slice(&scalar_H_vec);
+        scalar_gw.extend_from_slice(&scalar_C_vec);
+        scalar_gw.extend_from_slice(&scalar_I_vec);
+        scalar_gw.extend_from_slice(&scalar_p_vec);
+        scalar_gw.extend_from_slice(&scalar_g_prime_vec);
+        scalar_gw.extend_from_slice(&scalar_g_extend_vec);
+
+        let mut points_gw: Vec<RistrettoPoint> = Vec::with_capacity(N);
+        points_gw.extend_from_slice(&vec![*G, self.C_res, *Gt]);
+        points_gw.extend_from_slice(&P_vec);
+        points_gw.extend_from_slice(&H_vec);
+        points_gw.extend_from_slice(&C_vec);
+        points_gw.extend_from_slice(&self.I_vec);
+        points_gw.extend_from_slice(&p_vec);
+        points_gw.extend_from_slice(&g_prime_vec);
+        points_gw.extend_from_slice(&g_vec_append);
+
+
+        // compute exponent of h_vec
+        let mut beta_ext = Vec::with_capacity(N);
+        beta_ext.extend_from_slice(&beta);
+        beta_ext.extend_from_slice(&vec![Scalar::zero(); res]);
+
+        // 1/s[i] is s[!i], and !i runs from n-1 to 0 as i runs from 0 to n-1
+        let inv_s = s_vec.iter().rev();
+
+        let mut H_factors: Vec<Scalar> = Vec::with_capacity(N);
+        H_factors.extend_from_slice(&theta_inv);
+        H_factors.extend_from_slice(&vec![Scalar::one(); res]);
+
+        let h_times_b_div_s = H_factors
+            .into_iter()
+            .zip(inv_s)
+            .map(|(h_i, s_i_inv)| (self.inner_product_proof.b * s_i_inv) * h_i.borrow());
+
+        let scalar_h_vec = beta_ext
+            .into_iter()
+            .zip(h_times_b_div_s)
+            .map(|(beta_i, h_b_s_i)| h_b_s_i - beta_i.borrow())
+            .take(N);
+
+        let mut points_h_vec: Vec<RistrettoPoint> = Vec::with_capacity(N);
+        points_h_vec.extend_from_slice(&h_vec);
+        points_h_vec.extend_from_slice(&h_vec_append);
+
+        // exponents of L_vec, R_vec
+        let neg_u_sq = u_sq.iter().map(|ui| -ui);
+        let neg_u_inv_sq = u_inv_sq.iter().map(|ui| -ui);
+
+        let Ls = self.inner_product_proof
+            .L_vec
+            .iter()
+            .map(|p| p.decompress().ok_or(ProofError::VerificationError))
+            .collect::<Result<Vec<_>, _>>()
+            .expect("Unable to decompress L!");
+
+        let Rs = self.inner_product_proof
+            .R_vec
+            .iter()
+            .map(|p| p.decompress().ok_or(ProofError::VerificationError))
+            .collect::<Result<Vec<_>, _>>()
+            .expect("Unable to decompress R!");
+
+        // exponent of Q, G, H_prime, H
+        let scalar_Q = (self.inner_product_proof.a * self.inner_product_proof.b) - self.t_hat;
+        let scalar_G = &c * (&delta - &self.t_hat);
+        let scalar_H_prime = self.r;
+        let scalar_H = -c * self.tau_x;
+
+        // exponent of T_1, T_2, A, S
+        let scalar_T1 = &c * &x;
+        let scalar_T2 = &scalar_T1 * &x;
+        // let scalar_A = -Scalar::one();
+        let scalar_S = -&x;
+
+        let expected = RistrettoPoint::vartime_multiscalar_mul(
+            iter::once(scalar_S)
+                .chain(scalar_gw)
+                .chain(scalar_h_vec)
+                .chain(neg_u_sq)
+                .chain(neg_u_inv_sq)
+                .chain(vec![
+                    scalar_Q, 
+                    scalar_G, 
+                    scalar_H_prime, 
+                    scalar_H, 
+                    scalar_T1,
+                    scalar_T2,
+                    ]),
+            iter::once(self.S)
+                .chain(points_gw)
+                .chain(points_h_vec)
+                .chain(Ls)
+                .chain(Rs)
+                .chain(vec![
+                    Q,
+                    *G,
+                    *H_prime,
+                    *H,
+                    self.T1,
+                    self.T2,
+                ])
+        );
+        
+        // check the single multi-exp is equal to A
+        //
+        // g_w^{a.sg_vec - alpha} . H^{b.theta_inv \circ sh_vec - beta} . 
+        // L_vec^{-u_sq_vec} . R_vec^{-u_inv_sq_vec} . Q^{a.b - t_hat} .
+        // G^{delta - t_hat} . (H')^{r} . H^{-c tau_x} . 
+        // T1^{cx} . T2^{cx^2} . S^{-x}  
+        // =?
+        // A  
+        if expected == self.A {
+            Ok(())
+        } else {
+            Err(MProvePlusError)
+        }
+    }
+
     pub fn gen_params(n: usize, s: usize) -> (
         RistrettoPoint,
         RistrettoPoint,
@@ -981,7 +1211,7 @@ mod tests {
             
             let start = PreciseTime::now();
             // let mut transcript = Transcript::new(b"mprovetest");
-            let result = mprove_test.verify(&G, &H, &Gt, &H_prime, &p_vec, &g_prime_vec, &h_vec, &g_vec_append, &h_vec_append, &C_vec_mut, &P_vec, &H_vec);
+            let result = mprove_test.fast_verify(&G, &H, &Gt, &H_prime, &p_vec, &g_prime_vec, &h_vec, &g_vec_append, &h_vec_append, &C_vec_mut, &P_vec, &H_vec);
             let end = PreciseTime::now();
             libc_println!("Verification time: {:?}", start.to(end));
 
