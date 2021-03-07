@@ -234,8 +234,6 @@ pub struct Omnires {
     t_hat: Scalar,
     // proof data for the inner-product argument.
     inner_product_proof: InnerProductProof,
-    // constraint vectors
-    constraint_vec: Constraints,
 }
 
 impl Omnires {
@@ -579,7 +577,6 @@ impl Omnires {
             r,
             t_hat: t_hat,
             inner_product_proof,
-            constraint_vec,
         };
     }
 
