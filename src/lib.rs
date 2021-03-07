@@ -28,6 +28,7 @@ extern crate digest;
 extern crate byteorder;
 extern crate libc_print;
 extern crate time;
+extern crate to_binary;
 
 
 pub mod proofs;
@@ -40,5 +41,6 @@ pub mod generators;
 pub enum Errors {
     InnerProductError,
     MProvePlusError,
+    OmniresError,
     ProofError,
 }

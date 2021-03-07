@@ -1,7 +1,7 @@
 /*
 
 Copyright (c) 2018 Chain, Inc.
-This file is a part of the bulletproofs package by dalek-cryptography.
+Some parts of this file are from the bulletproofs package by dalek-cryptography.
 Link: https://github.com/dalek-cryptography/bulletproofs
 Description: Utilities for Scalar operations.
 
@@ -12,6 +12,7 @@ Description: Utilities for Scalar operations.
 use curve25519_dalek::scalar::Scalar;
 use alloc::vec;
 use alloc::vec::Vec;
+use libc_print::{libc_println};
 
 /// Provides an iterator over the powers of a `Scalar`.
 ///
@@ -97,9 +98,54 @@ pub fn sum_of_powers(x: &Scalar, n: usize) -> Scalar {
     result
 }
 
+/// Batch inversion using Montgomery's trick. 
+/// Note that this would throw an error if any of the inputs is zero.
+pub fn batch_invert(inputs: &mut Vec<Scalar>) {
+
+    let n: usize = inputs.len();
+    let mut temp_products: Vec<Scalar> = Vec::with_capacity(n);
+    temp_products.push(inputs[0]);
+    for i in 1..n {
+        assert!(inputs[i] != Scalar::zero());
+        temp_products.push(temp_products[i - 1] * inputs[i]);
+    }
+
+    let inverted: Scalar = temp_products[n - 1].invert();
+    let mut remaining = Scalar::one();
+    for i in (1..n).rev() {
+        let temp = inputs[i];
+        inputs[i] = temp_products[i - 1] * inverted * remaining;
+        remaining *= temp;
+    }
+    inputs[0] = remaining * inverted;
+}
+
 /// Given `data` with `len >= 32`, return the first 32 bytes.
 pub fn read32(data: &[u8]) -> [u8; 32] {
     let mut buf32 = [0u8; 32];
     buf32[..].copy_from_slice(&data[..32]);
     buf32
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn batch_invert_test() {
+        let n: usize = 512;
+        let mut rng = rand::thread_rng();
+        let mut inputs_copy: Vec<Scalar> = Vec::new();
+        let mut inputs = (0..n).map(|_| {
+                let input = Scalar::random(&mut rng);
+                inputs_copy.push(input);
+                input.clone()
+            }).collect::<Vec<Scalar>>();
+        
+        batch_invert(&mut inputs);
+        for i in 0..n {
+            assert_eq!(inputs_copy[i].invert(), inputs[i]);
+        }
+    }
+
 }

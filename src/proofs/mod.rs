@@ -9,4 +9,5 @@ Link: https://github.com/suyash67/MProvePlus-Ristretto
 
 pub mod inner_product;
 pub mod mprove_plus_ristretto;
+pub mod omnires;
 

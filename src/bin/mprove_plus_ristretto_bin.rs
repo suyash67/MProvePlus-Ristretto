@@ -79,13 +79,15 @@ fn main() {
         gen_proof_end = PreciseTime::now();
         total_gen_proof_duration += (gen_proof_start.to(gen_proof_end)).num_milliseconds();
 
-        println!("verification starts!");
+        println!("Proof {} generated!", _i);
   
         ver_proof_start = PreciseTime::now();
         result = mprove_plus_proof.fast_verify(&G, &H, &Gt, &H_prime, &p_vec, &g_prime_vec, &h_vec, &g_vec_append, &h_vec_append, &C_vec_mut, &P_vec, &H_vec);
         assert!(result.is_ok());
         ver_proof_end = PreciseTime::now();
         total_ver_proof_duration += (ver_proof_start.to(ver_proof_end)).num_milliseconds();
+
+        println!("Proof {} verified!", _i);
     }
   
     let sim_end = PreciseTime::now();
