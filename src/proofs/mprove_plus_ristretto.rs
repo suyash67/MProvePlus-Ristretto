@@ -59,15 +59,12 @@ impl Constraints{
         let y_sn: Vec<Scalar> = util::exp_iter(y).take(sn).collect();
         let y_n: Vec<Scalar> = util::exp_iter(y).take(n).collect();
         let v_s: Vec<Scalar> = util::exp_iter(v).take(s).collect();
-        // let mut vs_kronecker_yn: Vec<Scalar> = y_n.clone();
         let mut vs_kronecker_yn: Vec<Scalar> = Vec::with_capacity(sn);
         vs_kronecker_yn.extend_from_slice(&y_n.as_slice());
         
-        // let mut ones_kronecker_yn: Vec<Scalar> = y_n.clone();
         let mut ones_kronecker_yn: Vec<Scalar> = Vec::with_capacity(sn);
         ones_kronecker_yn.extend_from_slice(y_n.as_slice());
 
-        // let mut ys_kronecker_one: Vec<Scalar> = vec![Scalar::one(); n];
         let mut ys_kronecker_one: Vec<Scalar> = Vec::with_capacity(sn);
         ys_kronecker_one.extend_from_slice(&vec![Scalar::one(); n]);
         let mut temp_vec;
@@ -81,7 +78,6 @@ impl Constraints{
         // v0
         let mut v0: Vec<Scalar> = Vec::with_capacity(t);
         let one = Scalar::one();
-        // v0.extend_from_slice(&vec![v; 2*n+3]);
         // changing v to one for lesser group operations
         v0.extend_from_slice(&vec![one; 2*n+3]);
         // let mut v0: Vec<Scalar> = vec![v; 2*n+3];
@@ -98,13 +94,11 @@ impl Constraints{
         // v2
         let mut v2: Vec<Scalar> = Vec::with_capacity(t);
         v2.push(Scalar::one());
-        // let mut v2: Vec<Scalar> = vec![Scalar::one(); 1];
         v2.extend_from_slice(&vec![Scalar::zero(); t-1]);
 
         // v3
         let mut v3: Vec<Scalar> = Vec::with_capacity(t);
         let minus_y_n: Vec<Scalar> = (0..n).map(|i| -y_n[i]).collect();
-        // let mut v3: Vec<Scalar> = vec![Scalar::zero(); 3];
         v3.extend_from_slice(&vec![Scalar::zero(); 3]);
         v3.extend_from_slice(&minus_y_n);
         v3.extend_from_slice(&vec![Scalar::zero(); n+s]);
@@ -113,7 +107,6 @@ impl Constraints{
         // v4
         let mut v4: Vec<Scalar> = Vec::with_capacity(t);
         v4.extend_from_slice(&vec![Scalar::zero(); n+3]);
-        // let mut v4: Vec<Scalar> = vec![Scalar::zero(); n+3];
         v4.extend_from_slice(&minus_y_n);
         v4.extend_from_slice(&vec![Scalar::zero(); s]);
         v4.extend_from_slice(&ones_kronecker_yn);
@@ -122,21 +115,18 @@ impl Constraints{
         let mut v5: Vec<Scalar> = Vec::with_capacity(t);
         let minus_y_pow_s = -util::scalar_exp_vartime(&y, s as u64);
         v5.extend_from_slice(&vec![Scalar::zero(), minus_y_pow_s]);
-        // let mut v5: Vec<Scalar> = vec![Scalar::zero(), minus_y_pow_s];
         v5.extend_from_slice(&vec![Scalar::zero(); 2*n+s+1]);
         v5.extend_from_slice(&ys_kronecker_one);
 
         // v6
         let mut v6: Vec<Scalar> = Vec::with_capacity(t);
         v6.extend_from_slice(&vec![Scalar::zero(); 2*n + s + 3]);
-        // let mut v6: Vec<Scalar> = vec![Scalar::zero(); 2*n + s + 3];
         v6.extend_from_slice(&y_sn);
 
         // v7
         let mut v7: Vec<Scalar> = Vec::with_capacity(t);
         v7.extend_from_slice(&vec![Scalar::zero(); 2*n+3]);
         let u_v_s: Vec<Scalar> = v_s.iter().zip(vec![u; s].iter()).map(|(vi, u)| vi * u).collect();
-        // let mut v7: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
         v7.extend_from_slice(&u_v_s);
         v7.extend_from_slice(&vec![Scalar::zero(); sn]);
 
@@ -147,7 +137,8 @@ impl Constraints{
         // theta_inv is set as 1 where theta is 0
         let mut theta_inv: Vec<Scalar> = Vec::with_capacity(t);
         theta_inv.extend_from_slice(&vec![one; 2*n+3]);
-        let theta_inv_ext: Vec<Scalar> = theta[2*n+3..].iter().map(|thetai| thetai.invert()).collect();
+        let mut theta_inv_ext: Vec<Scalar> = theta[2*n+3..].to_vec().clone();
+        util::batch_invert(&mut theta_inv_ext);
         theta_inv.extend_from_slice(&theta_inv_ext);
 
         // zeta
@@ -277,10 +268,8 @@ impl MProvePlus {
                     
                     // generate key-images I = (x_i)H_i
                     I_vec_temp[index] = H_vec[i] * x_vec[index];
-                    // I_vec_temp.push(H_vec[i] * x_vec[index]);
 
                     // update secret commitment vector
-                    // C_vec_temp.push(C_vec[i]);
                     C_vec_temp[index] = C_vec[i];
 
                     index = index + 1;
@@ -317,31 +306,18 @@ impl MProvePlus {
         let C_res = gamma_Gt + C_res1;
 
         // define compressed stmt Y_hat_vec
-        let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| P_vec[i] * u).collect();
-        // let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| 
-        //     RistrettoPoint::vartime_multiscalar_mul(&[u.clone()], &[P_vec[i]])
-        // ).collect();
-        
         let u_square = u*u;
         let minus_u_sq = -u_square;
-        let H_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| H_vec[i] * u_square).collect();
-        // let H_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| 
-        //     RistrettoPoint::vartime_multiscalar_mul(&[u_square.clone()], &[H_vec[i]])
-        // ).collect();
+        let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| 
+            P_vec[i] * u + H_vec[i] * u_square
+            ).collect();
         
-        let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| H_vec_temp[i] + P_vec_temp[i]).collect();
-        // let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| 
-        //     RistrettoPoint::vartime_multiscalar_mul(&[Scalar::one(), Scalar::one()], &[P_vec_temp[i], H_vec_temp[i]])
-        // ).collect();
-
         // define compressed I_hat_vec
         let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| I_vec[i] * (minus_u_sq * v_s[i])).collect();
-        // let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| 
-        //     RistrettoPoint::vartime_multiscalar_mul(&[minus_u_sq * v_s[i]], &[I_vec[i]])
-        // ).collect();
-
+        
         // define x_inv_vec
-        let x_inv_vec: Vec<Scalar> = (0..s).map(|i| x_vec[i].invert()).collect();
+        let mut x_inv_vec: Vec<Scalar> = x_vec.to_vec().clone();
+        util::batch_invert(&mut x_inv_vec);
 
         // define compressed secrets
         let minus_u = -u;
@@ -351,7 +327,6 @@ impl MProvePlus {
         // c L := ( ξ || − 1 || γ || ê || e' || x^◦−1 || vec(E))
         let mut c_L: Vec<Scalar> = Vec::with_capacity(t);
         c_L.push(xi.clone());
-        // let mut c_L: Vec<Scalar> = vec![xi.clone()];
         c_L.push(-Scalar::one());
         c_L.push(*gamma);
         c_L.extend_from_slice(&e_hat.clone());
@@ -362,7 +337,6 @@ impl MProvePlus {
         // c R := (0^2n+3 || x || vec(E) − 1^sn )
         let mut c_R: Vec<Scalar> = Vec::with_capacity(t);
         c_R.extend_from_slice(&vec![Scalar::zero(); 2*n+3]);
-        // let mut c_R: Vec<Scalar> = vec![Scalar::zero(); 2*n+3];
         c_R.extend_from_slice(&x_vec);
         c_R.extend_from_slice(&E_mat_comp);
     
@@ -387,7 +361,6 @@ impl MProvePlus {
         // defining g_w
         let mut g_vec_w: Vec<RistrettoPoint> = Vec::with_capacity(t);
         g_vec_w.extend_from_slice(&vec![*G, C_res, *Gt]);
-        // let mut g_vec_w: Vec<RistrettoPoint> = vec![*G, C_res, *Gt];
         g_vec_w.extend_from_slice(&Y_hat_vec);
         g_vec_w.extend_from_slice(&C_vec);
         g_vec_w.extend_from_slice(&I_hat_vec);
@@ -402,7 +375,6 @@ impl MProvePlus {
         // P -> V: S
         // S = (H' * r_s) + <g_w * s_L> + <h * s_R>
         let r_S = Scalar::random(&mut rng);
-        // let s_R = (0..t).map(|_| Scalar::random(&mut rng)).collect::<Vec<Scalar>>();
         let s_L = (0..t).map(|_| Scalar::random(&mut rng)).collect::<Vec<Scalar>>();
 
         // s_R[j]=0 if c_R[j]=0, else a random scalar
@@ -413,7 +385,6 @@ impl MProvePlus {
 
         let H_prime_r_S = H_prime * r_S;
         let sL_gw = (0..t).map(|i| g_vec_w[i] * s_L[i]).fold(H_prime_r_S, |acc, x| acc + x);
-        // s_R*H computation only for non-zero positions
         let S = (2*n+3..t).map(|i| h_vec[i] * s_R[i]).fold(sL_gw, |acc, x| acc + x);
 
         // challenges y,z
@@ -477,8 +448,6 @@ impl MProvePlus {
         // Append 0s to secret vectors
         let mut a: Vec<Scalar> = Vec::with_capacity(N);
         let mut b: Vec<Scalar> = Vec::with_capacity(N);
-        // let mut a = Lp.clone();
-        // let mut b = Rp.clone();
         a.extend_from_slice(&Lp);
         b.extend_from_slice(&Rp);
         a.extend_from_slice(&zero_append_vec);
@@ -487,12 +456,10 @@ impl MProvePlus {
         // Multipliers of base vectors
         let G_factors: Vec<Scalar> = iter::repeat(Scalar::one()).take(N).collect();
         let mut H_factors: Vec<Scalar> = Vec::with_capacity(N);
-        // let mut H_factors: Vec<Scalar> = theta_inv.clone();
         H_factors.extend_from_slice(&theta_inv);
         H_factors.extend_from_slice(&vec![Scalar::one(); res]);
 
         // Append random group generators to g_vec_w and hi_tag        
-        // let mut g_vec_long = g_vec_w.clone();
         let mut g_vec_long: Vec<RistrettoPoint> = Vec::with_capacity(N);
         let mut h_vec_long: Vec<RistrettoPoint> = Vec::with_capacity(N);
         g_vec_long.extend_from_slice(&g_vec_w);
@@ -578,20 +545,12 @@ impl MProvePlus {
         transcript.extend_from_slice(self.T2.compress().as_bytes());
         let x = Scalar::hash_from_bytes::<Sha512>(&transcript);
 
-        // comment out the following code if you wish to use pre-computed constraint vectors.
         // build constraint vectors
         let constraint_vec1 = Constraints::generate_constraints(u,v,y,z,n,s);
         let theta_inv = constraint_vec1.theta_inv.clone();
         let alpha = constraint_vec1.alpha.clone();
         let delta = constraint_vec1.delta.clone();
-        let beta = constraint_vec1.beta.clone();
-
-        // uncomment the following code to use the already computed constraint vectors.
-        // // we are using already computed constraint vectors by prover
-        // let theta_inv = self.constraint_vec.theta_inv.clone();
-        // let alpha = self.constraint_vec.alpha.clone();
-        // let delta = self.constraint_vec.delta.clone();
-        // let beta = self.constraint_vec.beta.clone();     
+        let beta = constraint_vec1.beta.clone();    
 
         // verification equation #2
         // lhs
@@ -608,29 +567,17 @@ impl MProvePlus {
         // towards verification eqn #3
         // define compressed stmt Y_hat_vec
         let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| P_vec[i] * u).collect();
-        // let P_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| 
-        //     RistrettoPoint::vartime_multiscalar_mul(&[u.clone()], &[P_vec[i]])
-        // ).collect();
         
         let u_square = u*u;
         let minus_u_sq = -u_square;
         let H_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| H_vec[i] * u_square).collect();
-        // let H_vec_temp: Vec<RistrettoPoint> = (0..n).map(|i| 
-        //     RistrettoPoint::vartime_multiscalar_mul(&[u_square.clone()], &[H_vec[i]])
-        // ).collect();
         
         let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| H_vec_temp[i] + P_vec_temp[i]).collect();
-        // let Y_hat_vec: Vec<RistrettoPoint> = (0..n).map(|i| 
-        //     RistrettoPoint::vartime_multiscalar_mul(&[Scalar::one(), Scalar::one()], &[P_vec_temp[i], H_vec_temp[i]])
-        // ).collect();
-
+        
         // define compressed I_hat_vec
         let v_s: Vec<Scalar> = util::exp_iter(v).take(s).collect();
         let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| self.I_vec[i] * (minus_u_sq * v_s[i])).collect();
-        // let I_hat_vec: Vec<RistrettoPoint> = (0..s).map(|i| 
-        //     RistrettoPoint::vartime_multiscalar_mul(&[minus_u_sq * v_s[i]], &[self.I_vec[i]])
-        // ).collect();
-
+        
         // defining g_w
         let mut g_vec_w: Vec<RistrettoPoint> = Vec::with_capacity(t);
         g_vec_w.extend_from_slice(&vec![*G, self.C_res, *Gt]);
