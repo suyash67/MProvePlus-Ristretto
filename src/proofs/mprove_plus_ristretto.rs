@@ -1149,18 +1149,16 @@ mod tests {
             })
             .collect::<Vec<Scalar>>();
 
-            libc_println!("For n={}, s={},", n, s);
-            let start = PreciseTime::now();
-            // let mut transcript = Transcript::new(b"mprovetest");
+            // libc_println!("For n={}, s={},", n, s);
+            // let start = PreciseTime::now();
             let mprove_test = MProvePlus::prove(&G, &H, &Gt, &H_prime, &p_vec, &g_prime_vec, &h_vec, &g_vec_append, &h_vec_append, &C_vec_mut, &P_vec, &H_vec, &E_vec, &x_vec, &gamma);
-            let end = PreciseTime::now();
-            libc_println!("Generation time: {:?}", start.to(end));
+            // let end = PreciseTime::now();
+            // libc_println!("Generation time: {:?}", start.to(end));
             
-            let start = PreciseTime::now();
-            // let mut transcript = Transcript::new(b"mprovetest");
+            // let start = PreciseTime::now();
             let result = mprove_test.fast_verify(&G, &H, &Gt, &H_prime, &p_vec, &g_prime_vec, &h_vec, &g_vec_append, &h_vec_append, &C_vec_mut, &P_vec, &H_vec);
-            let end = PreciseTime::now();
-            libc_println!("Verification time: {:?}", start.to(end));
+            // let end = PreciseTime::now();
+            // libc_println!("Verification time: {:?}", start.to(end));
 
             assert!(result.is_ok());
     }

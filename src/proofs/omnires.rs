@@ -1178,8 +1178,6 @@ mod omniring_tests {
                                             &r_vec,
                                             &a_res, 
                                             &gamma);
-        
-        libc_println!("Proof generated");
 
         let result = mprove_test.verify(&G, 
                                         &H, 
@@ -1213,9 +1211,8 @@ mod omniring_tests {
                  a_res,
                  gamma) = Omnires::gen_params(n, s);
 
-            libc_println!("For n={}, s={},", n, s);
-            let start = PreciseTime::now();
-            // let mut transcript = Transcript::new(b"mprovetest");
+            // libc_println!("For n={}, s={},", n, s);
+            // let start = PreciseTime::now();
             let mprove_test = Omnires::prove(&G, 
                                                 &H, 
                                                 &H_prime, 
@@ -1233,10 +1230,10 @@ mod omniring_tests {
                                                 &r_vec, 
                                                 &a_res,
                                                 &gamma);
-            let end = PreciseTime::now();
-            libc_println!("Generation time: {:?}", start.to(end));
+            // let end = PreciseTime::now();
+            // libc_println!("Generation time: {:?}", start.to(end));
             
-            let start = PreciseTime::now();
+            // let start = PreciseTime::now();
             // let mut transcript = Transcript::new(b"mprovetest");
             let result = mprove_test.fast_verify(&G, 
                                                  &H, 
@@ -1249,8 +1246,8 @@ mod omniring_tests {
                                                  &C_vec_mut, 
                                                  &P_vec, 
                                                  &H_vec);
-            let end = PreciseTime::now();
-            libc_println!("Verification time: {:?}", start.to(end));
+            // let end = PreciseTime::now();
+            // libc_println!("Verification time: {:?}", start.to(end));
 
             assert!(result.is_ok());
     }
