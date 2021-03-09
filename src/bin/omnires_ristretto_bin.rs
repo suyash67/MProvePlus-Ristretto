@@ -153,7 +153,7 @@ fn main() {
         gen_proof_end = PreciseTime::now();
         total_gen_proof_duration += (gen_proof_start.to(gen_proof_end)).num_milliseconds();
 
-        println!("Proof {} generated!", _i);
+        // println!("Proof {} generated!", _i);
   
         ver_proof_start = PreciseTime::now();
         result = omnires_proof.fast_verify(&G, 
@@ -171,7 +171,7 @@ fn main() {
         ver_proof_end = PreciseTime::now();
         total_ver_proof_duration += (ver_proof_start.to(ver_proof_end)).num_milliseconds();
 
-        println!("Proof {} verified!", _i);
+        // println!("Proof {} verified!", _i);
     }
   
     let sim_end = PreciseTime::now();
@@ -179,7 +179,7 @@ fn main() {
 
     libc_println!("Average proof generation time = {:?}",
       (total_gen_proof_duration as f64/(1000.0*num_iter as f64)));
-    libc_println!("Average proof verification time = {:?}",
+    libc_println!("Average proof verification time = {:?}\n",
       (total_ver_proof_duration as f64/(1000.0*num_iter as f64)));
 
 }
