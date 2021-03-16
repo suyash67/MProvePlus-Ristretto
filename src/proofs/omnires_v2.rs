@@ -33,7 +33,7 @@ use libc_print::{libc_println};
 use to_binary::{BinaryString,BinaryError};
 
 
-static NUM_BITS: usize = 64;
+static NUM_BITS: usize = 1;
 
 #[derive(Clone, Debug)]
 pub struct Constraints{
@@ -63,13 +63,11 @@ impl Constraints{
         let sn: usize = s*n;
 
         let one = Scalar::one();
-        let two = Scalar::from(2 as u32);
 
         let y_s: Vec<Scalar> = util::exp_iter(y).take(s).collect();
         let y_n: Vec<Scalar> = util::exp_iter(y).take(n).collect();
-        let y_sn_plus_bits: Vec<Scalar> = util::exp_iter(y).take(sn + NUM_BITS).collect();
+        let y_sn: Vec<Scalar> = util::exp_iter(y).take(sn).collect();
         let v_s: Vec<Scalar> = util::exp_iter(v).take(s).collect();
-        let two_bits: Vec<Scalar> = util::exp_iter(two).take(NUM_BITS).collect();
         
         // v^s ⊗ y^n 
         let mut vs_kronecker_yn: Vec<Scalar> = Vec::with_capacity(sn);
@@ -90,12 +88,12 @@ impl Constraints{
             ys_kronecker_one.extend_from_slice(&vec![y_s[i]; n]);
         }
 
-        // v0 = [1  1  1^n  0^s  y^{sn + bits}  0^{2s}]
+        // v0 = [1  1  1^n  0^s  y^{sn}  1  1^{2s}]
         let mut v0: Vec<Scalar> = Vec::with_capacity(t);
         v0.extend_from_slice(&vec![one; n+2]);
         v0.extend_from_slice(&vec![Scalar::zero(); s]);
-        v0.extend_from_slice(&y_sn_plus_bits);
-        v0.extend_from_slice(&vec![one; 2*s]);
+        v0.extend_from_slice(&y_sn);
+        v0.extend_from_slice(&vec![one; 2*s + NUM_BITS]);
 
         // v1 = [0  0  0^n  y^s  0^{sn + bits + 2s}]
         let mut v1: Vec<Scalar> = Vec::with_capacity(t);
@@ -103,10 +101,10 @@ impl Constraints{
         v1.extend_from_slice(&y_s);
         v1.extend_from_slice(&vec![Scalar::zero(); sn + NUM_BITS + 2*s]);
 
-        // v2 = [0  0  0^n  0^s  0^{sn}  2^{bits}  0^{2s}]
+        // v2 = [0  0  0^n  0^s  0^{sn}  1  0^{2s}]
         let mut v2: Vec<Scalar> = Vec::with_capacity(t);
         v2.extend_from_slice(&vec![Scalar::zero(); sn+n+s+2]);
-        v2.extend_from_slice(&two_bits);
+        v2.push(Scalar::one());
         v2.extend_from_slice(&vec![Scalar::zero(); 2*s]);
 
         // v3 = [0  0  0^n  0^s  (y^s ⊗ 1^n)  0^{bits}  0^{2s}]
@@ -139,17 +137,18 @@ impl Constraints{
         v6.extend_from_slice(&vs_kronecker_yn);
         v6.extend_from_slice(&vec![Scalar::zero(); NUM_BITS + 2*s]);
 
-        // v7 = [0  0  0^n  0^s  0^{sn}  2^{bits}  -1^s  0^s]
+        // v7 = [0  0  0^n  0^s  0^{sn}  1  -1^s  0^s]
         let mut v7: Vec<Scalar> = Vec::with_capacity(t);
         v7.extend_from_slice(&vec![Scalar::zero(); sn+n+s+2]);
-        v7.extend_from_slice(&two_bits);
+        v7.push(Scalar::one());
         v7.extend_from_slice(&vec![-Scalar::one(); s]);
         v7.extend_from_slice(&vec![Scalar::zero(); s]);
 
         // v8 = [0  0  0^n  0^s  y^{sn + bits}  0^{bits}  0^s  0^s]
         let mut v8: Vec<Scalar> = Vec::with_capacity(t);
         v8.extend_from_slice(&vec![Scalar::zero(); n+s+2]);
-        v8.extend_from_slice(&y_sn_plus_bits);
+        v8.extend_from_slice(&y_sn);
+        v7.push(Scalar::zero());
         v8.extend_from_slice(&vec![Scalar::zero(); NUM_BITS + 2*s]);
 
         // u5 = [0  0  0^n  v^s  0^{sn}  0^{bits}  0^s  0^s]
@@ -322,33 +321,6 @@ impl Omniresv2 {
             )
             .collect();
 
-        // generate B (the binary representation of a_res)
-        let a_res_bytes = a_res.to_bytes();
-        let non_zero_bytes = NUM_BITS / 8;
-        for i in non_zero_bytes..32 {
-            assert!(a_res_bytes[i] == 0u8, "Amount of total reserves is greater than 2^64!");
-        }
-        let a_res_binary = &BinaryString::from(a_res_bytes).0[0..NUM_BITS];
-
-        let mut a_res_final: String = String::new();
-        for i in 0..NUM_BITS/8 {
-            let reversed = &a_res_binary[8*i..8*(i+1)].chars().rev().collect::<String>();
-            a_res_final.push_str(reversed);
-        }
-
-        let mut B: Vec<Scalar> = Vec::with_capacity(NUM_BITS);
-        let mut B_comp: Vec<Scalar> = Vec::with_capacity(NUM_BITS);
-        for c in a_res_final.chars() {
-            if c == '1' {
-                B.push(Scalar::one());
-                B_comp.push(Scalar::zero());
-            }
-            else {
-                B.push(Scalar::zero());
-                B_comp.push(Scalar::one());
-            }
-        }
-
         // generate key-images from I_vec_temp
         let I_vec = I_vec_temp;
 
@@ -376,39 +348,24 @@ impl Omniresv2 {
         let xi = (0..s).map(|i| v_s[i] * amounts[i] * minus_u).fold(Scalar::zero(), |acc, x| acc + x);
         let eta = (0..s).map(|i| -v_s[i] * (x_vec[i] + u * blindings[i])).fold(Scalar::zero(), |acc, x| acc + x);
 
-        // DEBUG /////////////////
-        // CHECK main equality
-        let main_eq = RistrettoPoint::vartime_multiscalar_mul(
-            e_hat.iter()
-            .chain(x_inv_vec.iter())
-            .chain(iter::once(&xi))
-            .chain(iter::once(&eta)),
-            Y_hat_vec.iter()
-            .chain(I_hat_vec.iter())
-            .chain(iter::once(H))
-            .chain(iter::once(G)),
-        );
-        assert_eq!(main_eq, Scalar::zero() * G);
-        //////////////////////////
-
         // secret vectors
-        // c_L := ( ξ || η || ê || x^◦−1 || vec(E) || vec(B) || amounts || blindings)
+        // c_L := ( ξ || η || ê || x^◦−1 || vec(E) || a_res || amounts || blindings)
         let mut c_L: Vec<Scalar> = Vec::with_capacity(t);
         c_L.push(xi.clone());
         c_L.push(eta.clone());
         c_L.extend_from_slice(&e_hat.clone());
         c_L.extend_from_slice(&x_inv_vec.clone());
         c_L.extend_from_slice(&E_mat.clone());
-        c_L.extend_from_slice(&B.clone());
+        c_L.push(a_res.clone());
         c_L.extend_from_slice(&amounts.clone());
         c_L.extend_from_slice(&blindings.clone());
         
-        // c R := (0^{2+n} || x || vec(E) − 1^sn || vec(B) - 1^s || 0^{2s} )
+        // c R := (0^{2+n} || x || vec(E) − 1^sn || 0 || 0^{2s} )
         let mut c_R: Vec<Scalar> = Vec::with_capacity(t);
         c_R.extend_from_slice(&vec![Scalar::zero(); n + 2]);
         c_R.extend_from_slice(&x_vec);
         c_R.extend_from_slice(&E_mat_comp);
-        c_R.extend_from_slice(&B_comp);
+        c_R.push(Scalar::zero());
         c_R.extend_from_slice(&vec![Scalar::zero(); 2*s]);
     
         // defining g_0
@@ -516,11 +473,6 @@ impl Omniresv2 {
         let t_hat = Lp.iter().zip(Rp.iter()).fold(Scalar::zero(), |acc, x| {
             acc + (x.0*x.1)
         });
-
-        // DEBUG ///////////////// 
-        let lhs = t2*x*x + t1*x + constraint_vec.delta + z*z*a_res;
-        assert_eq!(lhs, t_hat);
-        ///////////////////
 
         // Running inner product argument
         let Q = RistrettoPoint::hash_from_bytes::<Sha512>(b"test point");

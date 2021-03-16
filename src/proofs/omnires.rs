@@ -376,21 +376,6 @@ impl Omnires {
         let xi = (0..s).map(|i| v_s[i] * amounts[i] * minus_u).fold(Scalar::zero(), |acc, x| acc + x);
         let eta = (0..s).map(|i| -v_s[i] * (x_vec[i] + u * blindings[i])).fold(Scalar::zero(), |acc, x| acc + x);
 
-        // DEBUG /////////////////
-        // CHECK main equality
-        let main_eq = RistrettoPoint::vartime_multiscalar_mul(
-            e_hat.iter()
-            .chain(x_inv_vec.iter())
-            .chain(iter::once(&xi))
-            .chain(iter::once(&eta)),
-            Y_hat_vec.iter()
-            .chain(I_hat_vec.iter())
-            .chain(iter::once(H))
-            .chain(iter::once(G)),
-        );
-        assert_eq!(main_eq, Scalar::zero() * G);
-        //////////////////////////
-
         // secret vectors
         // c_L := ( ξ || η || ê || x^◦−1 || vec(E) || vec(B) || amounts || blindings)
         let mut c_L: Vec<Scalar> = Vec::with_capacity(t);
@@ -516,11 +501,6 @@ impl Omnires {
         let t_hat = Lp.iter().zip(Rp.iter()).fold(Scalar::zero(), |acc, x| {
             acc + (x.0*x.1)
         });
-
-        // DEBUG ///////////////// 
-        let lhs = t2*x*x + t1*x + constraint_vec.delta + z*z*a_res;
-        assert_eq!(lhs, t_hat);
-        ///////////////////
 
         // Running inner product argument
         let Q = RistrettoPoint::hash_from_bytes::<Sha512>(b"test point");
