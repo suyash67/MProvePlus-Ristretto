@@ -1,0 +1,174 @@
+Options = Opt { anon_list_size: 150, own_list_size: 100, num_iter: 1 }
+Max estimated time: 16.088
+Total simulation time = Duration { secs: 2, nanos: 677138557 }
+Average proof generation time = 2.44
+Average proof verification time = 0.236
+
+Options = Opt { anon_list_size: 250, own_list_size: 100, num_iter: 1 }
+Max estimated time: 29.76
+Total simulation time = Duration { secs: 5, nanos: 721833031 }
+Average proof generation time = 4.88
+Average proof verification time = 0.841
+
+Options = Opt { anon_list_size: 300, own_list_size: 100, num_iter: 1 }
+Max estimated time: 32.96
+Total simulation time = Duration { secs: 5, nanos: 843115769 }
+Average proof generation time = 5.365
+Average proof verification time = 0.477
+
+Options = Opt { anon_list_size: 400, own_list_size: 100, num_iter: 1 }
+Max estimated time: 58.944
+Total simulation time = Duration { secs: 11, nanos: 87216189 }
+Average proof generation time = 10.087
+Average proof verification time = 0.999
+
+Options = Opt { anon_list_size: 600, own_list_size: 100, num_iter: 1 }
+Max estimated time: 63.263999999999996
+Total simulation time = Duration { secs: 11, nanos: 613656819 }
+Average proof generation time = 10.53
+Average proof verification time = 1.082
+
+Options = Opt { anon_list_size: 1000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 127.04
+Total simulation time = Duration { secs: 22, nanos: 395742426 }
+Average proof generation time = 20.286
+Average proof verification time = 2.109
+
+Options = Opt { anon_list_size: 1200, own_list_size: 100, num_iter: 1 }
+Max estimated time: 126.848
+Total simulation time = Duration { secs: 23, nanos: 97706241 }
+Average proof generation time = 20.904
+Average proof verification time = 2.193
+
+Options = Opt { anon_list_size: 2000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 260.608
+Total simulation time = Duration { secs: 45, nanos: 210053976 }
+Average proof generation time = 41.038
+Average proof verification time = 4.171
+
+Options = Opt { anon_list_size: 2500, own_list_size: 100, num_iter: 1 }
+Max estimated time: 255.36
+Total simulation time = Duration { secs: 46, nanos: 705950642 }
+Average proof generation time = 42.403
+Average proof verification time = 4.302
+
+Options = Opt { anon_list_size: 4500, own_list_size: 100, num_iter: 1 }
+Max estimated time: 509.696
+Total simulation time = Duration { secs: 91, nanos: 931234106 }
+Average proof generation time = 83.346
+Average proof verification time = 8.585
+
+Options = Opt { anon_list_size: 5000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 547.328
+Total simulation time = Duration { secs: 94, nanos: 649461215 }
+Average proof generation time = 86.117
+Average proof verification time = 8.532
+
+Options = Opt { anon_list_size: 8000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 1023.4879999999999
+Total simulation time = Duration { secs: 183, nanos: 825534422 }
+Average proof generation time = 166.536
+Average proof verification time = 17.289
+
+Options = Opt { anon_list_size: 10000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 1030.656
+Total simulation time = Duration { secs: 186, nanos: 141415589 }
+Average proof generation time = 168.971
+Average proof verification time = 17.169
+
+Options = Opt { anon_list_size: 16000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 2028.544
+Total simulation time = Duration { secs: 358, nanos: 749840452 }
+Average proof generation time = 325.182
+Average proof verification time = 33.567
+
+Options = Opt { anon_list_size: 30000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 3751.9359999999997
+Total simulation time = Duration { secs: 702, nanos: 150640373 }
+Average proof generation time = 636.599
+Average proof verification time = 65.55
+
+Options = Opt { anon_list_size: 35000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 3999.7439999999997
+Total simulation time = Duration { secs: 716, nanos: 311689383 }
+Average proof generation time = 651.312
+Average proof verification time = 64.999
+
+Options = Opt { anon_list_size: 5000, own_list_size: 50, num_iter: 1 }
+Max estimated time: 248.96
+Total simulation time = Duration { secs: 46, nanos: 804756387 }
+Average proof generation time = 42.625
+Average proof verification time = 4.179
+
+Options = Opt { anon_list_size: 5000, own_list_size: 50, num_iter: 1 }
+Max estimated time: 249.344
+Total simulation time = Duration { secs: 46, nanos: 117396540 }
+Average proof generation time = 41.849
+Average proof verification time = 4.268
+
+Options = Opt { anon_list_size: 5000, own_list_size: 90, num_iter: 1 }
+Max estimated time: 500.224
+Total simulation time = Duration { secs: 89, nanos: 662185702 }
+Average proof generation time = 81.6
+Average proof verification time = 8.061
+
+Options = Opt { anon_list_size: 5000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 498.688
+Total simulation time = Duration { secs: 90, nanos: 715290125 }
+Average proof generation time = 82.509
+Average proof verification time = 8.205
+
+Options = Opt { anon_list_size: 5000, own_list_size: 200, num_iter: 1 }
+Max estimated time: 992.7679999999999
+Total simulation time = Duration { secs: 181, nanos: 346904575 }
+Average proof generation time = 165.068
+Average proof verification time = 16.278
+
+Options = Opt { anon_list_size: 5000, own_list_size: 500, num_iter: 1 }
+Max estimated time: 4009.984
+Total simulation time = Duration { secs: 678, nanos: 183527632 }
+Average proof generation time = 615.958
+Average proof verification time = 62.225
+
+Options = Opt { anon_list_size: 5000, own_list_size: 800, num_iter: 1 }
+Max estimated time: 4048.896
+Total simulation time = Duration { secs: 728, nanos: 17006305 }
+Average proof generation time = 661.789
+Average proof verification time = 66.227
+
+Options = Opt { anon_list_size: 60000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 8118.272
+Total simulation time = Duration { secs: 1439, nanos: 722828827 }
+Average proof generation time = 1296.0
+Average proof verification time = 143.722
+
+Options = Opt { anon_list_size: 80000, own_list_size: 100, num_iter: 1 }
+Max estimated time: 8142.848
+Total simulation time = Duration { secs: 1563, nanos: 743393744 }
+Average proof generation time = 1408.904
+Average proof verification time = 154.839
+
+Options = Opt { anon_list_size: 5000, own_list_size: 1200, num_iter: 1 }
+Max estimated time: 8011.776
+Total simulation time = Duration { secs: 1416, nanos: 692656029 }
+Average proof generation time = 1276.202
+Average proof verification time = 140.49
+
+Options = Opt { anon_list_size: 5000, own_list_size: 1500, num_iter: 1 }
+Max estimated time: 8028.16
+Total simulation time = Duration { secs: 1412, nanos: 206747994 }
+Average proof generation time = 1270.313
+Average proof verification time = 141.893
+
+Options = Opt { anon_list_size: 5000, own_list_size: 2000, num_iter: 1 }
+Max estimated time: 14860.287999999999
+Total simulation time = Duration { secs: 2732, nanos: 920378070 }
+Average proof generation time = 2428.142
+Average proof verification time = 304.778
+
+Options = Opt { anon_list_size: 5000, own_list_size: 2500, num_iter: 1 }
+Max estimated time: 15335.424
+Total simulation time = Duration { secs: 2870, nanos: 689148745 }
+Average proof generation time = 2556.647
+Average proof verification time = 314.041
+
